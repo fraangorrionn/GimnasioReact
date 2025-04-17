@@ -1,0 +1,91 @@
+.cabecera {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+  }
+  
+  .cabecera-superior {
+    background-color: #222;
+    color: white;
+    padding: 0.5rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .logo-titulo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .logo {
+    height: 120px;
+    width: auto;
+  }
+  
+  .perfil-dropdown {
+    position: relative;
+  }
+  
+  .perfil-btn {
+    background: none;
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .perfil-icono {
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .perfil-menu {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background-color: #333;
+    color: white;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+    border-radius: 4px;
+    min-width: 150px;
+  }
+  
+  .perfil-dropdown:hover .perfil-menu {
+    display: flex;
+  }
+  
+  .cabecera-nav {
+    background-color: #444;
+    padding: 0.5rem 1rem;
+  }
+  
+  .cabecera-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+  
+  .cabecera-nav a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .cabecera-nav a:hover {
+    text-decoration: underline;
+  }

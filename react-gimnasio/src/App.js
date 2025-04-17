@@ -1,16 +1,20 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import ClasesPage from './pages/ClasesPage';
-import LoginPage from './pages/LoginPage';
-import RegistroPage from './pages/RegistroPage';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import LoginPagina from './paginas/loginPagina';
+import RegistroPagina from './paginas/registroPagina';
+import Cabecera from './componentes/cabecera';
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/clases" element={<ClasesPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/registro" element={<RegistroPage />} />
-      </Routes>
+      <Cabecera />
+      <div style={{ marginTop: '110px' }}>
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/login" element={<LoginPagina />} />
+          <Route path="/registro" element={<RegistroPagina />} />
+        </Routes>
+      </div>
     </Router>
   );
 }
