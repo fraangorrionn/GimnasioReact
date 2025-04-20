@@ -1,0 +1,45 @@
+/* Reset global mínimo */
+body, html {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Contenedor del carrusel */
+  .inicio-container {
+    margin: 0;
+    background-color: #fff;
+    text-align: center;
+  }
+  
+  /* Swiper ocupa toda la anchura y mantiene la proporción 16:9 */
+  .swiper {
+    width: 100vw;
+    aspect-ratio: 16 / 9; /* Proporción perfecta para 1920x1080 */
+  }
+  
+  /* Cada slide ocupa todo el contenedor */
+  .swiper-slide {
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* Imagenes adaptadas al slide */
+  .carrusel-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  /* Zoom al pasar el ratón */
+  .carrusel-img:hover {
+    transform: scale(1.03);
+    cursor: pointer;
+  }
+  
+  /* Bullet activo personalizado */
+  .swiper-pagination-bullet-active {
+    background-color: limegreen;
+  }
+  

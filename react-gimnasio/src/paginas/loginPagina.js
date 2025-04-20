@@ -1,6 +1,8 @@
+// src/paginas/LoginPagina.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import './loginPagina.css'; // Asegúrate de crear este archivo CSS
 
 function LoginPagina() {
   const [formData, setFormData] = useState({ username: '', password: '' });
@@ -22,22 +24,24 @@ function LoginPagina() {
       localStorage.setItem('access_token', access);
       localStorage.setItem('refresh_token', refresh);
 
-      navigate('/clases'); // redirige a clases al loguear
+      navigate('/clases');
     } catch (err) {
       setError('Credenciales incorrectas. Intenta de nuevo.');
     }
   };
 
   return (
-    <div>
-      <h2>Iniciar sesión</h2>
-      <form onSubmit={handleSubmit}>
-        <input type="text" name="username" placeholder="Usuario o correo" value={formData.username} onChange={handleChange} required />
-        <input type="password" name="password" placeholder="Contraseña" value={formData.password} onChange={handleChange} required />
-        <button type="submit">Entrar</button>
-      </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <p>¿No tienes cuenta? <Link to="/registro">Regístrate</Link></p>
+    <div className="login-container">
+      <div className="login-card">
+        <h2>Iniciar sesión</h2>
+        <form onSubmit={handleSubmit}>
+          <input type="text" name="username" placeholder="Usuario o correo" value={formData.username} onChange={handleChange} required />
+          <input type="password" name="password" placeholder="Contraseña" value={formData.password} onChange={handleChange} required />
+          <button type="submit" className="btn-entrar">Entrar</button>
+        </form>
+        {error && <p className="error">{error}</p>}
+        <p className="registro-link">¿No tienes cuenta? <Link to="/registro">Regístrate</Link></p>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,8 @@
+// src/paginas/registroPagina.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import './registroPagina.css'; // Asegúrate de crear este archivo CSS
 
 function RegistroPagina() {
   const navigate = useNavigate();
@@ -23,7 +25,7 @@ function RegistroPagina() {
     try {
       const response = await axios.post('http://localhost:8000/api/usuarios/registrar_usuario/', formData);
       console.log('Usuario registrado:', response.data);
-      navigate('/login'); // redirige al login tras registrarse
+      navigate('/login');
     } catch (err) {
       console.error(err);
       setError('Error al registrarse. Verifica los datos.');
@@ -31,19 +33,21 @@ function RegistroPagina() {
   };
 
   return (
-    <div>
-      <h2>Registro</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <input type="text" name="username" placeholder="Nombre de usuario" value={formData.username} onChange={handleChange} required />
-        <input type="email" name="email" placeholder="Correo electrónico" value={formData.email} onChange={handleChange} required />
-        <input type="password" name="password" placeholder="Contraseña" value={formData.password} onChange={handleChange} required />
-        <select name="rol" value={formData.rol} onChange={handleChange}>
-          <option value="cliente">Cliente</option>
-          <option value="monitor">Monitor</option>
-        </select>
-        <button type="submit">Registrarse</button>
-      </form>
+    <div className="registro-container">
+      <div className="registro-card">
+        <h2>Registro</h2>
+        {error && <p className="error">{error}</p>}
+        <form onSubmit={handleSubmit}>
+          <input type="text" name="username" placeholder="Nombre de usuario" value={formData.username} onChange={handleChange} required />
+          <input type="email" name="email" placeholder="Correo electrónico" value={formData.email} onChange={handleChange} required />
+          <input type="password" name="password" placeholder="Contraseña" value={formData.password} onChange={handleChange} required />
+          <select name="rol" value={formData.rol} onChange={handleChange}>
+            <option value="cliente">Cliente</option>
+            <option value="monitor">Monitor</option>
+          </select>
+          <button type="submit" className="btn-registrarse">Registrarse</button>
+        </form>
+      </div>
     </div>
   );
 }

@@ -1,12 +1,12 @@
 .cabecera {
-    position: fixed;
+    position: sticky;
     top: 0;
     width: 100%;
     z-index: 100;
   }
   
   .cabecera-superior {
-    background-color: #222;
+    background-color: #000000;
     color: white;
     padding: 0.5rem 1rem;
     display: flex;
@@ -51,7 +51,7 @@
     position: absolute;
     right: 0;
     top: 100%;
-    background-color: #333;
+    background-color: rgba(0, 0, 0, 0.7); /* negro transparente */
     color: white;
     padding: 0.5rem 1rem;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
@@ -60,16 +60,20 @@
     gap: 0.5rem;
     border-radius: 4px;
     min-width: 150px;
+    backdrop-filter: blur(5px); /* (opcional) */
   }
+  
   
   .perfil-dropdown:hover .perfil-menu {
     display: flex;
   }
   
   .cabecera-nav {
-    background-color: #444;
+    background-color: rgba(0, 0, 0, 0.7); /* negro transparente */
     padding: 0.5rem 1rem;
+    backdrop-filter: blur(5px); /* (opcional) desenfoque detrás para efecto moderno */
   }
+  
   
   .cabecera-nav ul {
     list-style: none;
