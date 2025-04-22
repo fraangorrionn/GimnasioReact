@@ -1,8 +1,8 @@
-// src/paginas/LoginPagina.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-import './loginPagina.css'; // Asegúrate de crear este archivo CSS
+import { jwtDecode } from 'jwt-decode';
+import './loginPagina.css';
 
 function LoginPagina() {
   const [formData, setFormData] = useState({ username: '', password: '' });
@@ -21,8 +21,18 @@ function LoginPagina() {
       const response = await axios.post('http://localhost:8000/api/login/', formData);
       const { access, refresh } = response.data;
 
+      // Decodificar token para obtener username y rol
+      const decoded = jwtDecode(access);
+      const usuario = {
+        id: decoded.user_id,
+        username: decoded.username,
+        rol: decoded.rol
+      };
+
+      // Guardar en localStorage
       localStorage.setItem('access_token', access);
       localStorage.setItem('refresh_token', refresh);
+      localStorage.setItem('usuario', JSON.stringify(usuario));
 
       navigate('/clases');
     } catch (err) {

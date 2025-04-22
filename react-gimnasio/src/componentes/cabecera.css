@@ -1,95 +1,99 @@
 .cabecera {
-    position: sticky;
-    top: 0;
-    width: 100%;
-    z-index: 100;
-  }
-  
-  .cabecera-superior {
-    background-color: #000000;
-    color: white;
-    padding: 0.5rem 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .logo-titulo {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .logo {
-    height: 120px;
-    width: auto;
-  }
-  
-  .perfil-dropdown {
-    position: relative;
-  }
-  
-  .perfil-btn {
-    background: none;
-    border: none;
-    color: white;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    font-weight: bold;
-  }
-  
-  .perfil-icono {
-    height: 30px;
-    width: 30px;
-    border-radius: 50%;
-    object-fit: cover;
-  }
-  
-  .perfil-menu {
-    position: absolute;
-    right: 0;
-    top: 100%;
-    background-color: rgba(0, 0, 0, 0.7); /* negro transparente */
-    color: white;
-    padding: 0.5rem 1rem;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-    display: none;
-    flex-direction: column;
-    gap: 0.5rem;
-    border-radius: 4px;
-    min-width: 150px;
-    backdrop-filter: blur(5px); /* (opcional) */
-  }
-  
-  
-  .perfil-dropdown:hover .perfil-menu {
-    display: flex;
-  }
-  
-  .cabecera-nav {
-    background-color: rgba(0, 0, 0, 0.7); /* negro transparente */
-    padding: 0.5rem 1rem;
-    backdrop-filter: blur(5px); /* (opcional) desenfoque detrás para efecto moderno */
-  }
-  
-  
-  .cabecera-nav ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-  }
-  
-  .cabecera-nav a {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  
-  .cabecera-nav a:hover {
-    text-decoration: underline;
-  }
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+.cabecera-superior {
+  background-color: #000000;
+  color: white;
+  padding: 0.5rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo {
+  height: 120px;
+  width: auto;
+}
+
+.perfil-dropdown {
+  position: relative;
+}
+
+/* Botón del perfil */
+.perfil-btn {
+  background: none;
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Icono de perfil */
+.perfil-icono {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Menú desplegable */
+.perfil-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  display: none;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-radius: 4px;
+  min-width: 150px;
+  backdrop-filter: blur(5px);
+  z-index: 10;
+}
+
+/* ✅ Mantener el menú abierto al pasar el ratón por el dropdown o el propio menú */
+.perfil-dropdown:hover .perfil-menu,
+.perfil-menu:hover {
+  display: flex;
+}
+
+.cabecera-nav {
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 0.5rem 1rem;
+  backdrop-filter: blur(5px);
+}
+
+.cabecera-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.cabecera-nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.cabecera-nav a:hover {
+  text-decoration: underline;
+}

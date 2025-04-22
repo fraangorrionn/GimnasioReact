@@ -1,0 +1,107 @@
+.crud-clases-container {
+  padding: 2rem;
+  max-width: 900px;
+  margin: auto;
+  color: white;
+}
+
+.formulario-clase {
+  background: #121212;
+  padding: 2rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.1);
+}
+
+.formulario-clase h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #00ff7f; /* verde brillante */
+}
+
+.formulario-clase label {
+  display: block;
+  margin-top: 1rem;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.formulario-clase input,
+.formulario-clase textarea {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.3rem;
+  background-color: #1e1e1e;
+  color: white;
+  border: 1px solid #00ff7f;
+  border-radius: 5px;
+}
+
+.formulario-clase input::placeholder,
+.formulario-clase textarea::placeholder {
+  color: #aaaaaa;
+}
+
+.botones-formulario {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+}
+
+.botones-formulario button {
+  flex: 1;
+  margin: 0 0.5rem;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.botones-formulario button:hover {
+  transform: scale(1.03);
+}
+
+.btn-crear {
+  background-color: #00c853;
+  color: white;
+}
+
+.btn-editar {
+  background-color: #2979ff;
+  color: white;
+}
+
+.btn-cancelar {
+  background-color: #d50000;
+  color: white;
+}
+
+.lista-clases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.tarjeta-clase {
+  background: #1f1f1f;
+  padding: 1.5rem;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 2px 10px rgba(0, 255, 0, 0.05);
+  color: white;
+}
+
+.tarjeta-clase h3 {
+  margin-top: 0;
+  color: #00ff7f;
+}
+
+.tarjeta-clase .acciones {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
