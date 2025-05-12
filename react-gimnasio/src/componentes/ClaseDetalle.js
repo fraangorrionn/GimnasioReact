@@ -30,6 +30,7 @@ function ClaseDetalle() {
   const obtenerHorarios = useCallback(async () => {
     const res = await axios.get('http://localhost:8000/api/horarios/');
     const filtrados = res.data.filter(h => h.clase === parseInt(id));
+    console.log("Horarios obtenidos:", filtrados);
     setHorarios(filtrados);
   }, [id]);
 
@@ -107,32 +108,54 @@ function ClaseDetalle() {
 
   const handleClickCelda = (dia, hora) => {
     if (!esMonitor) return;
-    setCeldaActiva({ dia, hora });
+    setCeldaActiva({ dia, hora: hora.padStart(5, '0') }); // Aseguramos el formato "HH:MM"
   };
 
   const handleAgregarClase = async () => {
     const { dia, hora } = celdaActiva;
-    await axios.post('http://localhost:8000/api/horarios/crear/', {
-      clase: id,
-      dia_semana: dia,
-      hora_inicio: `${hora.padStart(2, '0')}:00`,
-      hora_fin: `${parseInt(hora) + 1}:00`,
-    });
-    setCeldaActiva(null);
-    obtenerHorarios();
+
+    try {
+      await axios.post('http://localhost:8000/api/horarios/crear/', {
+        clase: id,
+        dia_semana: dia,
+        hora_inicio: `${hora.padStart(2, '0')}:00`,
+        hora_fin: `${parseInt(hora) + 1}:00`,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      setCeldaActiva(null);
+      obtenerHorarios();
+    } catch (error) {
+      console.error("Error al agregar horario:", error);
+      alert("No se pudo crear el horario. ¿Estás autenticado como monitor?");
+    }
   };
 
   const handleEliminarClase = async () => {
-    const { dia, hora } = celdaActiva;
-    const horario = horarios.find(h =>
-      h.dia_semana === dia && h.hora_inicio === `${hora.padStart(2, '0')}:00:00`
-    );
-    if (horario) {
-      await axios.delete(`http://localhost:8000/api/horarios/eliminar/${horario.id}/`);
+  const { dia, hora } = celdaActiva;
+  const horario = horarios.find(h =>
+    h.dia_semana === dia && h.hora_inicio.startsWith(`${hora.padStart(2, '0')}:`)
+  );
+
+  if (horario) {
+    try {
+      await axios.delete(`http://localhost:8000/api/horarios/eliminar/${horario.id}/`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setCeldaActiva(null);
       obtenerHorarios();
+    } catch (error) {
+      console.error("Error al eliminar horario:", error);
+      alert("No se pudo eliminar el horario. ¿Estás autenticado como monitor?");
     }
-  };
+  }
+};
+
 
   const handleChangePublicacion = e => {
     const { name, value, files } = e.target;
@@ -154,14 +177,14 @@ function ClaseDetalle() {
     try {
       if (editandoPublicacionId) {
         await axios.put(`http://localhost:8000/api/publicaciones/editar/${editandoPublicacionId}/`, formData, {
-          headers: { 
+          headers: {
             'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${token}`
           }
         });
       } else {
         await axios.post('http://localhost:8000/api/publicaciones/crear/', formData, {
-          headers: { 
+          headers: {
             'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${token}`
           }
@@ -199,6 +222,9 @@ function ClaseDetalle() {
     }
   };
 
+  // Función para comparar horas
+  const normalizarHora = h => h.slice(0, 5); // "13:00:00" → "13:00"
+
   return (
     <div className="clase-detalle">
       <h2>Clase #{id}</h2>
@@ -227,36 +253,44 @@ function ClaseDetalle() {
             </tr>
           </thead>
           <tbody>
-            {HORAS.map(hora => (
-              <tr key={hora}>
-                <td>{hora}</td>
-                {DIAS.map(dia => {
-                  const horario = horarios.find(h =>
-                    h.dia_semana === dia && h.hora_inicio === `${hora.padStart(2, '0')}:00:00`
-                  );
-                  const esActiva = celdaActiva && celdaActiva.dia === dia && celdaActiva.hora === hora;
-                  return (
-                    <td
-                      key={`${dia}-${hora}`}
-                      className={horario ? 'ocupado' : 'libre'}
-                      onClick={() => handleClickCelda(dia, hora)}
-                      title={horario?.clase_nombre || 'Haz clic para modificar'}
-                    >
-                      {horario ? horario.clase_nombre : (esMonitor ? '+' : '')}
-                      {esActiva && esMonitor && (
-                        <div className="celda-horario-opciones">
-                          {horario ? (
-                            <button onClick={handleEliminarClase}>Quitar clase</button>
-                          ) : (
-                            <button onClick={handleAgregarClase}>Añadir clase</button>
-                          )}
-                        </div>
-                      )}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
+          {HORAS.map(hora => (
+            <tr key={hora}>
+              <td>{hora}</td>
+              {DIAS.map(dia => {
+                const horario = horarios.find(h =>
+                  h.dia_semana === dia && normalizarHora(h.hora_inicio) === hora.padStart(5, '0')
+                );
+                const esActiva = celdaActiva && celdaActiva.dia === dia && celdaActiva.hora === hora.padStart(5, '0');
+
+                return (
+                  <td
+                    key={`${dia}-${hora}`}
+                    className={horario ? 'ocupado' : 'libre'}
+                    onClick={() => handleClickCelda(dia, hora)}
+                    title={horario?.clase_nombre || 'Haz clic para modificar'}
+                  >
+                    {horario ? horario.clase_nombre : (esMonitor ? '+' : '')}
+
+                    {esActiva && esMonitor && (
+                      <div className="celda-horario-opciones">
+                        {horario ? (
+                          <button onClick={(e) => {
+                            e.stopPropagation(); // evita problemas visuales
+                            handleEliminarClase();
+                          }}>Quitar clase</button>
+                        ) : (
+                          <button onClick={(e) => {
+                            e.stopPropagation(); // por si hay eventos burbujeando
+                            handleAgregarClase();
+                          }}>Añadir clase</button>
+                        )}
+                      </div>
+                    )}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
           </tbody>
         </table>
       </section>
@@ -266,15 +300,18 @@ function ClaseDetalle() {
 
         {esMonitor && (
           <>
-            <button onClick={() => {
-              setMostrarFormPublicacion(!mostrarFormPublicacion);
-              setFormularioPublicacion({ clase: id, titulo: '', contenido: '', imagen: null });
-              setEditandoPublicacionId(null);
-            }}>
+            <button
+              className="btn-nueva-publicacion"
+              onClick={() => {
+                setMostrarFormPublicacion(!mostrarFormPublicacion);
+                setFormularioPublicacion({ clase: id, titulo: '', contenido: '', imagen: null });
+                setEditandoPublicacionId(null);
+              }}
+            >
               {mostrarFormPublicacion
                 ? 'Cancelar'
                 : editandoPublicacionId ? 'Editar publicación' : 'Nueva publicación'}
-            </button>
+          </button>
 
             {mostrarFormPublicacion && (
               <div className="form-publicacion">
