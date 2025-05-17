@@ -29,11 +29,12 @@ export default function Cabecera() {
       }).then(res => {
         const activa = res.data.some(s => s.estado === 'activa');
         setSuscripcionActiva(activa);
+        localStorage.removeItem('suscripcion_activada');
       }).catch(err => {
         console.error('Error al obtener suscripciones:', err);
       });
     }
-  }, [usuario, token]);
+  }, [usuario, token, localStorage.getItem('suscripcion_activada')]);
 
   const esMonitor = usuario?.rol === 'monitor' || usuario?.rol === 'admin';
 
@@ -58,7 +59,7 @@ export default function Cabecera() {
                 {suscripcionActiva ? (
                   <p style={{ color: 'limegreen' }}>Suscripción activa</p>
                 ) : (
-                  <button onClick={() => navigate('/suscripcion')}>
+                  <button onClick={() => navigate('/pago')}>
                     Suscribirse
                   </button>
                 )}
@@ -74,8 +75,6 @@ export default function Cabecera() {
         <nav>
           <ul>
             <li><Link to="/inicio">Inicio</Link></li>
-
-            {/* Solo visible para monitores o admin */}
             {esMonitor && <li><Link to="/crud/clases">Crear Clases</Link></li>}
           </ul>
         </nav>

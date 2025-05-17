@@ -1,13 +1,21 @@
+// ClaseDetalle.js
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './ClaseDetalle.css';
+import ComentariosPublicacion from './ComentariosPublicacion';
+
 
 const DIAS = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
 const HORAS = Array.from({ length: 16 }, (_, i) => `${7 + i}:00`);
 
 function ClaseDetalle() {
   const { id } = useParams();
+  const location = useLocation();
+  const suscripcionActivada = location.state?.suscripcion_activada || false;
+  const navigate = useNavigate();
+
+
   const [horarios, setHorarios] = useState([]);
   const [publicaciones, setPublicaciones] = useState([]);
   const [mostrarFormPublicacion, setMostrarFormPublicacion] = useState(false);
@@ -30,7 +38,6 @@ function ClaseDetalle() {
   const obtenerHorarios = useCallback(async () => {
     const res = await axios.get('http://localhost:8000/api/horarios/');
     const filtrados = res.data.filter(h => h.clase === parseInt(id));
-    console.log("Horarios obtenidos:", filtrados);
     setHorarios(filtrados);
   }, [id]);
 
@@ -81,7 +88,7 @@ function ClaseDetalle() {
     obtenerPublicaciones();
     obtenerInscripcion();
     verificarSuscripcionYPago();
-  }, [obtenerHorarios, obtenerPublicaciones, obtenerInscripcion, verificarSuscripcionYPago]);
+  }, [obtenerHorarios, obtenerPublicaciones, obtenerInscripcion, verificarSuscripcionYPago, suscripcionActivada]);
 
   const gestionarInscripcion = async () => {
     try {
@@ -238,10 +245,22 @@ function ClaseDetalle() {
       )}
 
       {esCliente && !puedeInscribirse && (
-        <div style={{ textAlign: 'center', color: 'tomato', marginBottom: '1rem' }}>
-          Necesitas una suscripción activa con un pago completado para inscribirte.
+        <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+          <p style={{ color: 'tomato' }}>
+            Necesitas una suscripción activa con un pago completado para inscribirte.
+          </p>
+          <button
+            className="btn-crear"
+            onClick={() => {
+              localStorage.setItem('clase_pago', id);
+              navigate('/pago');
+            }}
+          >
+            Suscribirse
+          </button>
         </div>
       )}
+
 
       <section className="horario-clase">
         <h3>Horario</h3>
@@ -356,6 +375,7 @@ function ClaseDetalle() {
                 <p>{p.contenido}</p>
                 {p.imagen && <img src={`http://localhost:8000${p.imagen}`} alt="Publicación" />}
                 <p className="fecha">{p.fecha_publicacion}</p>
+                <ComentariosPublicacion publicacionId={p.id} />
               </div>
             ))}
           </div>

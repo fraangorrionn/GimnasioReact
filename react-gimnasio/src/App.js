@@ -7,7 +7,6 @@ import Cabecera from './componentes/cabecera';
 import Footer from './componentes/footer';
 import CrudClases from './componentes/CrudClases';
 import ClaseDetalle from './componentes/ClaseDetalle';
-import SuscripcionView from './componentes/SuscripcionView';
 import PagoView from './componentes/PagoView';
 
 
@@ -22,7 +21,6 @@ function App() {
         <Route path="/registro" element={<RegistroPagina />} />
         <Route path="/crud/clases" element={<CrudClases />} />
         <Route path="/clases/:id" element={<ClaseDetalle />} />
-        <Route path="/suscripcion" element={<SuscripcionView />} />
         <Route path="/pago" element={<PagoView />} />
       </Routes>
       <Footer />

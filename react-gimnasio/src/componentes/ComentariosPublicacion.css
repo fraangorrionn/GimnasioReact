@@ -1,0 +1,131 @@
+/* CONTENEDOR PRINCIPAL */
+.comentarios-container {
+    margin-top: 2rem;
+    padding: 1rem;
+    border-top: 2px solid #2ecc71;
+    color: white;
+    background-color: #121212;
+    border-radius: 8px;
+  }
+  
+  .comentarios-container h4 {
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    color: #2ecc71;
+    text-align: center;
+  }
+  
+  /* FORMULARIO */
+  .form-comentario {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .form-comentario textarea {
+    background-color: #1e1e1e;
+    border: 1px solid #2ecc71;
+    color: white;
+    padding: 0.75rem;
+    border-radius: 6px;
+    resize: vertical;
+    min-height: 80px;
+  }
+  
+  .form-comentario button {
+    align-self: flex-end;
+    background-color: #2ecc71;
+    color: black;
+    font-weight: bold;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+  
+  .form-comentario button:hover {
+    background-color: #27ae60;
+  }
+  
+  /* LISTA Y ELEMENTOS DE COMENTARIOS */
+  .lista-comentarios {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+  }
+  
+  .comentario {
+    background-color: #1a1a1a;
+    padding: 1rem;
+    border: 1px solid #2ecc71;
+    border-radius: 6px;
+    color: white;
+  }
+  
+  .comentario strong {
+    color: #2ecc71;
+    font-size: 1rem;
+  }
+  
+  .comentario p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+  }
+  
+  .reacciones {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.95rem;
+  }
+  
+  .reacciones button {
+    background: transparent;
+    border: none;
+    color: #2ecc71;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  
+  .reacciones button:hover {
+    color: #27ae60;
+  }
+  
+  .reacciones .fecha {
+    color: #999;
+    margin-left: auto;
+    font-size: 0.85rem;
+  }
+  .btn-like,
+.btn-dislike {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-like {
+  background-color: #2ecc71;
+  color: black;
+}
+
+.btn-dislike {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn-like:hover {
+  background-color: #025c27;
+}
+
+.btn-dislike:hover {
+  background-color: #c0392b;
+}

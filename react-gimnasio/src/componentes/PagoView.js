@@ -1,101 +1,86 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import './CrudFormulario.css';
 
 function PagoView() {
-  const [formulario, setFormulario] = useState({
-    suscripcion: '',
-    cantidad: 20,
-    estado: 'completado',
-    tipo: 'mensual'
-  });
-
-  const usuario = JSON.parse(localStorage.getItem('usuario')) || {};
-  const token = localStorage.getItem('access_token');
   const navigate = useNavigate();
+  const token = localStorage.getItem('access_token');
 
   useEffect(() => {
-    const headers = { Authorization: `Bearer ${token}` };
+    const renderPayPalButton = () => {
+      if (!window.paypal) return;
 
-    axios.get('http://localhost:8000/api/suscripciones/', { headers })
-      .then(res => {
-        const activas = res.data
-          .filter(s => s.usuario === usuario.id && s.estado === 'activa')
-          .sort((a, b) => new Date(b.fecha_suscripcion) - new Date(a.fecha_suscripcion));
+      window.paypal.Buttons({
+        createOrder: (data, actions) => {
+          return actions.order.create({
+            purchase_units: [{
+              amount: { value: '10.00' }
+            }]
+          });
+        },
+        onApprove: async (data, actions) => {
+          try {
+            const order = await actions.order.capture();
+            console.log("✅ Pago capturado correctamente en PayPal:", order);
 
-        if (activas.length > 0) {
-          setFormulario(prev => ({ ...prev, suscripcion: activas[0].id }));
-        } else {
-          alert('No se encontró una suscripción activa. Redirigiendo...');
-          navigate('/suscripcion');
+            const response = await fetch('http://localhost:8000/api/pagos/crear/', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({})
+            });
+
+            if (!response.ok) {
+              const errorData = await response.json();
+              console.error("Error al registrar el pago en backend:", errorData);
+              alert('El pago se realizó pero no se registró correctamente en el sistema.');
+              return;
+            }
+
+            const data = await response.json();
+            console.log("Respuesta del backend:", data);
+
+            const claseId = localStorage.getItem('clase_pago');
+            localStorage.removeItem('clase_pago');
+            localStorage.setItem('suscripcion_activada', 'true');
+
+            alert('Pago completado y suscripción activada.');
+
+            if (claseId) {
+              navigate(`/clases/${claseId}`, { state: { suscripcion_activada: true } });
+            } else {
+              navigate('/inicio');
+            }
+          } catch (error) {
+            console.error('Error durante el proceso de pago:', error);
+            alert('Hubo un problema al procesar tu pago.');
+          }
+        },
+        onError: err => {
+          console.error('Error en PayPal:', err);
+          alert('Error durante el pago con PayPal.');
         }
-      })
-      .catch(err => {
-        console.error('Error al obtener suscripciones:', err);
-        alert('Error al obtener la suscripción');
-      });
-  }, [usuario.id, token, navigate]);
+      }).render('#paypal-button-container');
+    };
 
-  const realizarPago = () => {
-    const headers = { Authorization: `Bearer ${token}` };
-
-    if (!formulario.suscripcion) {
-      alert('No hay suscripción válida asociada');
+    const existingScript = document.getElementById('paypal-sdk');
+    if (existingScript) {
+      renderPayPalButton();
       return;
     }
 
-    const datos = {
-      suscripcion: formulario.suscripcion,
-      cantidad: formulario.cantidad,
-      estado: 'completado'
-    };
-
-    axios.post('http://localhost:8000/api/pagos/crear/', datos, { headers })
-      .then(() => {
-        alert('Pago realizado con éxito');
-        navigate('/inicio');
-      })
-      .catch(err => {
-        alert('Error al registrar el pago');
-        console.error(err);
-      });
-  };
-
-  const handleTipoChange = (e) => {
-    const tipo = e.target.value;
-    const cantidad = tipo === 'anual' ? 200 : 20;
-    setFormulario({ ...formulario, tipo, cantidad });
-  };
+    const paypalScript = document.createElement('script');
+    paypalScript.id = 'paypal-sdk';
+    paypalScript.src = 'https://www.paypal.com/sdk/js?client-id=Acn6jV7_CdjYnStEy6mamEfGQqkzlBk4fRh0yyO5rUlw2PFQFt0pHlkaoo6ea7gqCjQ3wDaAhBeoVcYQ&currency=EUR&components=buttons';
+    paypalScript.onload = renderPayPalButton;
+    document.body.appendChild(paypalScript);
+  }, [navigate, token]);
 
   return (
-    <div className="crud-clases-container">
-      <div className="formulario-clase">
-        <h2>Realizar pago</h2>
-        <form onSubmit={e => e.preventDefault()}>
-          <label>Tipo de suscripción</label>
-          <select name="tipo" value={formulario.tipo} onChange={handleTipoChange}>
-            <option value="mensual">Mensual - 20€</option>
-            <option value="anual">Anual - 200€</option>
-          </select>
-
-          <label>Cantidad (€)</label>
-          <input
-            type="number"
-            name="cantidad"
-            value={formulario.cantidad}
-            disabled
-            style={{ backgroundColor: '#eee', color: '#444' }}
-          />
-
-          {/* Estado fijo en completado */}
-          <input type="hidden" name="estado" value="completado" />
-
-          <div className="botones-formulario">
-            <button onClick={realizarPago} className="btn-crear">Pagar</button>
-          </div>
-        </form>
-      </div>
+    <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+      <h2>Completa tu suscripción</h2>
+      <div id="paypal-button-container" style={{ marginTop: '2rem' }}></div>
     </div>
   );
 }
