@@ -3,6 +3,8 @@ import axios from 'axios';
 import './ComentariosPublicacion.css';
 import { ThumbsUp, ThumbsDown } from 'lucide-react';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 function ComentariosPublicacion({ publicacionId }) {
   const [comentarios, setComentarios] = useState([]);
   const [nuevoComentario, setNuevoComentario] = useState('');
@@ -11,7 +13,7 @@ function ComentariosPublicacion({ publicacionId }) {
 
   const obtenerComentarios = async () => {
     try {
-      const res = await axios.get(`http://localhost:8000/api/comentarios/${publicacionId}/`);
+      const res = await axios.get(`${API_URL}/api/comentarios/${publicacionId}/`);
       setComentarios(res.data);
     } catch (err) {
       console.error('Error al obtener comentarios', err);
@@ -21,7 +23,7 @@ function ComentariosPublicacion({ publicacionId }) {
   const publicarComentario = async () => {
     if (!nuevoComentario.trim()) return;
     try {
-      await axios.post('http://localhost:8000/api/comentarios/crear/', {
+      await axios.post(`${API_URL}/api/comentarios/crear/`, {
         publicacion: publicacionId,
         contenido: nuevoComentario
       }, {
@@ -38,7 +40,7 @@ function ComentariosPublicacion({ publicacionId }) {
 
   const manejarLike = async (comentarioId, tipo) => {
     try {
-      await axios.post(`http://localhost:8000/api/comentarios/${comentarioId}/like_dislike_comentario/`, {
+      await axios.post(`${API_URL}/api/comentarios/${comentarioId}/like_dislike_comentario/`, {
         tipo: tipo
       }, {
         headers: {
@@ -74,14 +76,12 @@ function ComentariosPublicacion({ publicacionId }) {
             <strong>{com.usuario_data?.username}</strong>
             <p>{com.contenido}</p>
             <div className="reacciones">
-            <button className="btn-like" onClick={() => manejarLike(com.id, 'like')}>
-              <ThumbsUp size={18} /> {com.likes}
-            </button>
-
-            <button className="btn-dislike" onClick={() => manejarLike(com.id, 'dislike')}>
-              <ThumbsDown size={18} /> {com.dislikes}
-            </button>
-
+              <button className="btn-like" onClick={() => manejarLike(com.id, 'like')}>
+                <ThumbsUp size={18} /> {com.likes}
+              </button>
+              <button className="btn-dislike" onClick={() => manejarLike(com.id, 'dislike')}>
+                <ThumbsDown size={18} /> {com.dislikes}
+              </button>
               <span className="fecha">{new Date(com.fecha_comentario).toLocaleString()}</span>
             </div>
           </div>

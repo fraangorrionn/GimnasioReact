@@ -22,7 +22,7 @@ export default function Cabecera() {
 
   useEffect(() => {
     if (usuario?.rol === 'cliente' && token) {
-      axios.get('http://localhost:8000/api/suscripciones/', {
+      axios.get(`${process.env.REACT_APP_API_URL}/api/suscripciones/`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -35,6 +35,7 @@ export default function Cabecera() {
       });
     }
   }, [usuario, token, localStorage.getItem('suscripcion_activada')]);
+  
 
   const esMonitor = usuario?.rol === 'monitor' || usuario?.rol === 'admin';
 

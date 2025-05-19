@@ -4,6 +4,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import './loginPagina.css';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 function LoginPagina() {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState(null);
@@ -18,7 +20,7 @@ function LoginPagina() {
     setError(null);
 
     try {
-      const response = await axios.post('http://localhost:8000/api/login/', formData);
+      const response = await axios.post(`${API_URL}/api/login/`, formData);
       const { access, refresh } = response.data;
 
       // Decodificar token para obtener username y rol

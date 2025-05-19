@@ -2,7 +2,9 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import './registroPagina.css'; // Asegúrate de crear este archivo CSS
+import './registroPagina.css';
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 function RegistroPagina() {
   const navigate = useNavigate();
@@ -23,7 +25,7 @@ function RegistroPagina() {
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:8000/api/usuarios/registrar_usuario/', formData);
+      const response = await axios.post(`${API_URL}/api/usuarios/registrar_usuario/`, formData);
       console.log('Usuario registrado:', response.data);
       navigate('/login');
     } catch (err) {

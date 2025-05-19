@@ -16,13 +16,14 @@ import img4 from '../assets/carrusel4.png';
 import img5 from '../assets/carrusel5.png';
 import img6 from '../assets/carrusel6.png';
 
+const API_URL = process.env.REACT_APP_API_URL;
 const images = [img1, img2, img3, img4, img5, img6];
 
 function InicioPagina() {
   const [clases, setClases] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/clases/')
+    axios.get(`${API_URL}/api/clases/`)
       .then(res => setClases(res.data))
       .catch(err => console.error('Error cargando clases', err));
   }, []);

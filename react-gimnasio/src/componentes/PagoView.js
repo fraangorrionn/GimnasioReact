@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 function PagoView() {
   const navigate = useNavigate();
   const token = localStorage.getItem('access_token');
@@ -22,7 +24,7 @@ function PagoView() {
             const order = await actions.order.capture();
             console.log("✅ Pago capturado correctamente en PayPal:", order);
 
-            const response = await fetch('http://localhost:8000/api/pagos/crear/', {
+            const response = await fetch(`${API_URL}/api/pagos/crear/`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',

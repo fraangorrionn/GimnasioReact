@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';  // Esto es correcto
+import { jwtDecode } from 'jwt-decode';
 
 import './CrudFormulario.css';
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 function CrudClases() {
   const [clases, setClases] = useState([]);
@@ -11,14 +13,13 @@ function CrudClases() {
     descripcion: '',
     tipo: '',
     cupo_maximo: 10,
-    usuario: 1 // se sobrescribirá si hay usuario logueado
+    usuario: 1
   });
   const [modoEdicion, setModoEdicion] = useState(false);
   const [claseSeleccionada, setClaseSeleccionada] = useState(null);
 
-  // Verificar si el usuario está logueado y tiene el rol adecuado
   const usuario = JSON.parse(localStorage.getItem('usuario')) || {};
-  const token = localStorage.getItem('access_token'); // Obtener el token JWT
+  const token = localStorage.getItem('access_token');
   const esMonitor = token ? jwtDecode(token).rol === 'monitor' || jwtDecode(token).rol === 'admin' : false;
 
   useEffect(() => {
@@ -29,10 +30,8 @@ function CrudClases() {
   }, [esMonitor, usuario.id]);
 
   const obtenerClases = () => {
-    axios.get('http://localhost:8000/api/clases/', {
-      headers: {
-        Authorization: `Bearer ${token}`  // Enviar el token JWT en la solicitud
-      }
+    axios.get(`${API_URL}/api/clases/`, {
+      headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => setClases(res.data))
       .catch(err => console.error(err));
@@ -41,13 +40,11 @@ function CrudClases() {
   const crearClase = () => {
     if (!esMonitor) {
       console.log("Permiso denegado. Solo los monitores pueden crear clases.");
-      return; // Si no es monitor, no permitir crear clase
+      return;
     }
 
-    axios.post('http://localhost:8000/api/clases/crear/', formulario, {
-      headers: {
-        Authorization: `Bearer ${token}`  // Enviar el token JWT en la solicitud
-      }
+    axios.post(`${API_URL}/api/clases/crear/`, formulario, {
+      headers: { Authorization: `Bearer ${token}` }
     })
       .then(() => {
         obtenerClases();
@@ -58,20 +55,16 @@ function CrudClases() {
   };
 
   const eliminarClase = (id) => {
-    axios.delete(`http://localhost:8000/api/clases/eliminar/${id}/`, {
-      headers: {
-        Authorization: `Bearer ${token}`  // Enviar el token JWT en la solicitud
-      }
+    axios.delete(`${API_URL}/api/clases/eliminar/${id}/`, {
+      headers: { Authorization: `Bearer ${token}` }
     })
       .then(() => obtenerClases())
       .catch(err => console.error(err));
   };
 
   const editarClase = () => {
-    axios.put(`http://localhost:8000/api/clases/editar/${claseSeleccionada}/`, formulario, {
-      headers: {
-        Authorization: `Bearer ${token}`  // Enviar el token JWT en la solicitud
-      }
+    axios.put(`${API_URL}/api/clases/editar/${claseSeleccionada}/`, formulario, {
+      headers: { Authorization: `Bearer ${token}` }
     })
       .then(() => {
         obtenerClases();
@@ -104,7 +97,6 @@ function CrudClases() {
     setFormulario({ ...formulario, [e.target.name]: e.target.value });
   };
 
-  // Si no es monitor ni admin, no se muestra nada
   if (!esMonitor) return <div>No tienes permiso para ver esta página.</div>;
 
   return (

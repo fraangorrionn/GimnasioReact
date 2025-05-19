@@ -5,16 +5,15 @@ import axios from 'axios';
 import './ClaseDetalle.css';
 import ComentariosPublicacion from './ComentariosPublicacion';
 
-
 const DIAS = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
 const HORAS = Array.from({ length: 16 }, (_, i) => `${7 + i}:00`);
+const API_URL = process.env.REACT_APP_API_URL;
 
 function ClaseDetalle() {
   const { id } = useParams();
   const location = useLocation();
   const suscripcionActivada = location.state?.suscripcion_activada || false;
   const navigate = useNavigate();
-
 
   const [horarios, setHorarios] = useState([]);
   const [publicaciones, setPublicaciones] = useState([]);
@@ -36,14 +35,14 @@ function ClaseDetalle() {
   const esCliente = usuario.rol === 'cliente';
 
   const obtenerHorarios = useCallback(async () => {
-    const res = await axios.get('http://localhost:8000/api/horarios/');
+    const res = await axios.get(`${API_URL}/api/horarios/`);
     const filtrados = res.data.filter(h => h.clase === parseInt(id));
     setHorarios(filtrados);
   }, [id]);
 
   const obtenerPublicaciones = useCallback(async () => {
     try {
-      const res = await axios.get('http://localhost:8000/api/publicaciones/', {
+      const res = await axios.get(`${API_URL}/api/publicaciones/`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const filtradas = res.data.filter(p => p.clase === parseInt(id));
@@ -55,7 +54,7 @@ function ClaseDetalle() {
 
   const obtenerInscripcion = useCallback(() => {
     if (esCliente && token) {
-      axios.get('http://localhost:8000/api/inscripciones/', {
+      axios.get(`${API_URL}/api/inscripciones/`, {
         headers: { Authorization: `Bearer ${token}` }
       }).then(res => {
         const actual = res.data.find(i => i.usuario === usuario.id && i.clase === parseInt(id));
@@ -67,13 +66,13 @@ function ClaseDetalle() {
   const verificarSuscripcionYPago = useCallback(() => {
     if (!esCliente || !token) return;
 
-    axios.get('http://localhost:8000/api/suscripciones/', {
+    axios.get(`${API_URL}/api/suscripciones/`, {
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => {
       const activas = res.data.filter(s => s.usuario === usuario.id && s.estado === 'activa');
       if (activas.length > 0) {
         const suscripcionId = activas[0].id;
-        axios.get('http://localhost:8000/api/pagos/', {
+        axios.get(`${API_URL}/api/pagos/`, {
           headers: { Authorization: `Bearer ${token}` }
         }).then(pagosRes => {
           const tienePago = pagosRes.data.some(p => p.suscripcion === suscripcionId && p.estado === 'completado');
@@ -93,12 +92,12 @@ function ClaseDetalle() {
   const gestionarInscripcion = async () => {
     try {
       if (inscrito) {
-        await axios.delete(`http://localhost:8000/api/inscripciones/eliminar/${inscrito.id}/`, {
+        await axios.delete(`${API_URL}/api/inscripciones/eliminar/${inscrito.id}/`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setInscrito(null);
       } else {
-        await axios.post('http://localhost:8000/api/inscripciones/crear/', {
+        await axios.post(`${API_URL}/api/inscripciones/crear/`, {
           usuario: usuario.id,
           clase: parseInt(id),
           estado: 'activa'
@@ -115,14 +114,14 @@ function ClaseDetalle() {
 
   const handleClickCelda = (dia, hora) => {
     if (!esMonitor) return;
-    setCeldaActiva({ dia, hora: hora.padStart(5, '0') }); // Aseguramos el formato "HH:MM"
+    setCeldaActiva({ dia, hora: hora.padStart(5, '0') });
   };
 
   const handleAgregarClase = async () => {
     const { dia, hora } = celdaActiva;
 
     try {
-      await axios.post('http://localhost:8000/api/horarios/crear/', {
+      await axios.post(`${API_URL}/api/horarios/crear/`, {
         clase: id,
         dia_semana: dia,
         hora_inicio: `${hora.padStart(2, '0')}:00`,
@@ -142,27 +141,26 @@ function ClaseDetalle() {
   };
 
   const handleEliminarClase = async () => {
-  const { dia, hora } = celdaActiva;
-  const horario = horarios.find(h =>
-    h.dia_semana === dia && h.hora_inicio.startsWith(`${hora.padStart(2, '0')}:`)
-  );
+    const { dia, hora } = celdaActiva;
+    const horario = horarios.find(h =>
+      h.dia_semana === dia && h.hora_inicio.startsWith(`${hora.padStart(2, '0')}:`)
+    );
 
-  if (horario) {
-    try {
-      await axios.delete(`http://localhost:8000/api/horarios/eliminar/${horario.id}/`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      setCeldaActiva(null);
-      obtenerHorarios();
-    } catch (error) {
-      console.error("Error al eliminar horario:", error);
-      alert("No se pudo eliminar el horario. ¿Estás autenticado como monitor?");
+    if (horario) {
+      try {
+        await axios.delete(`${API_URL}/api/horarios/eliminar/${horario.id}/`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        setCeldaActiva(null);
+        obtenerHorarios();
+      } catch (error) {
+        console.error("Error al eliminar horario:", error);
+        alert("No se pudo eliminar el horario. ¿Estás autenticado como monitor?");
+      }
     }
-  }
-};
-
+  };
 
   const handleChangePublicacion = e => {
     const { name, value, files } = e.target;
@@ -183,14 +181,14 @@ function ClaseDetalle() {
 
     try {
       if (editandoPublicacionId) {
-        await axios.put(`http://localhost:8000/api/publicaciones/editar/${editandoPublicacionId}/`, formData, {
+        await axios.put(`${API_URL}/api/publicaciones/editar/${editandoPublicacionId}/`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${token}`
           }
         });
       } else {
-        await axios.post('http://localhost:8000/api/publicaciones/crear/', formData, {
+        await axios.post(`${API_URL}/api/publicaciones/crear/`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
             Authorization: `Bearer ${token}`
@@ -220,7 +218,7 @@ function ClaseDetalle() {
 
   const handleEliminarPublicacion = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/api/publicaciones/eliminar/${id}/`, {
+      await axios.delete(`${API_URL}/api/publicaciones/eliminar/${id}/`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       obtenerPublicaciones();
@@ -229,8 +227,7 @@ function ClaseDetalle() {
     }
   };
 
-  // Función para comparar horas
-  const normalizarHora = h => h.slice(0, 5); // "13:00:00" → "13:00"
+  const normalizarHora = h => h.slice(0, 5);
 
   return (
     <div className="clase-detalle">
@@ -261,7 +258,6 @@ function ClaseDetalle() {
         </div>
       )}
 
-
       <section className="horario-clase">
         <h3>Horario</h3>
         <table className="tabla-horarios">
@@ -272,44 +268,44 @@ function ClaseDetalle() {
             </tr>
           </thead>
           <tbody>
-          {HORAS.map(hora => (
-            <tr key={hora}>
-              <td>{hora}</td>
-              {DIAS.map(dia => {
-                const horario = horarios.find(h =>
-                  h.dia_semana === dia && normalizarHora(h.hora_inicio) === hora.padStart(5, '0')
-                );
-                const esActiva = celdaActiva && celdaActiva.dia === dia && celdaActiva.hora === hora.padStart(5, '0');
+            {HORAS.map(hora => (
+              <tr key={hora}>
+                <td>{hora}</td>
+                {DIAS.map(dia => {
+                  const horario = horarios.find(h =>
+                    h.dia_semana === dia && normalizarHora(h.hora_inicio) === hora.padStart(5, '0')
+                  );
+                  const esActiva = celdaActiva && celdaActiva.dia === dia && celdaActiva.hora === hora.padStart(5, '0');
 
-                return (
-                  <td
-                    key={`${dia}-${hora}`}
-                    className={horario ? 'ocupado' : 'libre'}
-                    onClick={() => handleClickCelda(dia, hora)}
-                    title={horario?.clase_nombre || 'Haz clic para modificar'}
-                  >
-                    {horario ? horario.clase_nombre : (esMonitor ? '+' : '')}
+                  return (
+                    <td
+                      key={`${dia}-${hora}`}
+                      className={horario ? 'ocupado' : 'libre'}
+                      onClick={() => handleClickCelda(dia, hora)}
+                      title={horario?.clase_nombre || 'Haz clic para modificar'}
+                    >
+                      {horario ? horario.clase_nombre : (esMonitor ? '+' : '')}
 
-                    {esActiva && esMonitor && (
-                      <div className="celda-horario-opciones">
-                        {horario ? (
-                          <button onClick={(e) => {
-                            e.stopPropagation(); // evita problemas visuales
-                            handleEliminarClase();
-                          }}>Quitar clase</button>
-                        ) : (
-                          <button onClick={(e) => {
-                            e.stopPropagation(); // por si hay eventos burbujeando
-                            handleAgregarClase();
-                          }}>Añadir clase</button>
-                        )}
-                      </div>
-                    )}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
+                      {esActiva && esMonitor && (
+                        <div className="celda-horario-opciones">
+                          {horario ? (
+                            <button onClick={(e) => {
+                              e.stopPropagation();
+                              handleEliminarClase();
+                            }}>Quitar clase</button>
+                          ) : (
+                            <button onClick={(e) => {
+                              e.stopPropagation();
+                              handleAgregarClase();
+                            }}>Añadir clase</button>
+                          )}
+                        </div>
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
           </tbody>
         </table>
       </section>
@@ -330,7 +326,7 @@ function ClaseDetalle() {
               {mostrarFormPublicacion
                 ? 'Cancelar'
                 : editandoPublicacionId ? 'Editar publicación' : 'Nueva publicación'}
-          </button>
+            </button>
 
             {mostrarFormPublicacion && (
               <div className="form-publicacion">
@@ -373,7 +369,7 @@ function ClaseDetalle() {
                 )}
                 <h4>{p.titulo}</h4>
                 <p>{p.contenido}</p>
-                {p.imagen && <img src={`http://localhost:8000${p.imagen}`} alt="Publicación" />}
+                {p.imagen && <img src={`${API_URL}${p.imagen}`} alt="Publicación" />}
                 <p className="fecha">{p.fecha_publicacion}</p>
                 <ComentariosPublicacion publicacionId={p.id} />
               </div>
