@@ -99,7 +99,7 @@ Si tienes dudas o encuentras errores, puedes contactarme a través de GitHub:
 ## Documentación adicional
 
 Puedes consultar el documento detallado del proyecto aquí:  
-[Documento del Proyecto (Google Docs)](https://docs.google.com/...) *(si lo tienes)*
+[Documento del Proyecto (Google Docs)](https://docs.google.com/document/d/1XSjxUyFBwzG6Lz1Mr-ADLLDHurLNNChOs62Wp-NC-KQ/edit?usp=sharing)
 
 ## Autor
 Nombre: Francisco
