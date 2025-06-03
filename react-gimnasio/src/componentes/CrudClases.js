@@ -15,6 +15,7 @@ function CrudClases() {
     cupo_maximo: 10,
     usuario: 1
   });
+  const [imagenClase, setImagenClase] = useState(null);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [claseSeleccionada, setClaseSeleccionada] = useState(null);
 
@@ -43,8 +44,21 @@ function CrudClases() {
       return;
     }
 
-    axios.post(`${API_URL}/api/clases/crear/`, formulario, {
-      headers: { Authorization: `Bearer ${token}` }
+    const formData = new FormData();
+    formData.append('nombre', formulario.nombre);
+    formData.append('descripcion', formulario.descripcion);
+    formData.append('tipo', formulario.tipo);
+    formData.append('cupo_maximo', formulario.cupo_maximo);
+    formData.append('usuario', formulario.usuario);
+    if (imagenClase) {
+      formData.append('imagen', imagenClase);
+    }
+
+    axios.post(`${API_URL}/api/clases/crear/`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data'
+      }
     })
       .then(() => {
         obtenerClases();
@@ -63,8 +77,21 @@ function CrudClases() {
   };
 
   const editarClase = () => {
-    axios.put(`${API_URL}/api/clases/editar/${claseSeleccionada}/`, formulario, {
-      headers: { Authorization: `Bearer ${token}` }
+    const formData = new FormData();
+    formData.append('nombre', formulario.nombre);
+    formData.append('descripcion', formulario.descripcion);
+    formData.append('tipo', formulario.tipo);
+    formData.append('cupo_maximo', formulario.cupo_maximo);
+    formData.append('usuario', formulario.usuario);
+    if (imagenClase) {
+      formData.append('imagen', imagenClase);
+    }
+
+    axios.put(`${API_URL}/api/clases/editar/${claseSeleccionada}/`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data'
+      }
     })
       .then(() => {
         obtenerClases();
@@ -85,12 +112,14 @@ function CrudClases() {
       cupo_maximo: clase.cupo_maximo,
       usuario: clase.usuario
     });
+    setImagenClase(null); // Limpiar imagen para evitar confusión, podría mejorarse mostrando la actual
   };
 
   const limpiarFormulario = () => {
     setFormulario({ nombre: '', descripcion: '', tipo: '', cupo_maximo: 10, usuario: usuario.id });
     setClaseSeleccionada(null);
     setModoEdicion(false);
+    setImagenClase(null);
   };
 
   const handleChange = e => {
@@ -116,6 +145,13 @@ function CrudClases() {
           <label>Cupo máximo</label>
           <input type="number" name="cupo_maximo" value={formulario.cupo_maximo} onChange={handleChange} />
 
+          <label>Imagen de la clase</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={e => setImagenClase(e.target.files[0])}
+          />
+
           <div className="botones-formulario">
             {modoEdicion ? (
               <>
@@ -132,6 +168,13 @@ function CrudClases() {
       <div className="lista-clases">
         {clases.map(clase => (
           <div key={clase.id} className="tarjeta-clase">
+            {clase.imagen_url && (
+              <img
+                src={clase.imagen_url}
+                alt={`Imagen de ${clase.nombre}`}
+                style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '8px', marginBottom: '10px' }}
+              />
+            )}
             <h3>{clase.nombre}</h3>
             <p><strong>Descripción:</strong> {clase.descripcion}</p>
             <p><strong>Tipo:</strong> {clase.tipo}</p>

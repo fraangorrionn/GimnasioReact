@@ -11,31 +11,54 @@ export default function Cabecera() {
   const token = localStorage.getItem('access_token');
 
   const [suscripcionActiva, setSuscripcionActiva] = useState(false);
-
-  const cerrarSesion = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('usuario');
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    navigate('/login');
-  };
+  const [fotoPerfilUrl, setFotoPerfilUrl] = useState(null);
+  const [mostrarModal, setMostrarModal] = useState(false);
+  const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
 
   useEffect(() => {
     if (usuario?.rol === 'cliente' && token) {
       axios.get(`${process.env.REACT_APP_API_URL}/api/suscripciones/`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        headers: { Authorization: `Bearer ${token}` }
       }).then(res => {
         const activa = res.data.some(s => s.estado === 'activa');
         setSuscripcionActiva(activa);
-        localStorage.removeItem('suscripcion_activada');
-      }).catch(err => {
-        console.error('Error al obtener suscripciones:', err);
-      });
+      }).catch(console.error);
     }
-  }, [usuario, token, localStorage.getItem('suscripcion_activada')]);
-  
+    if (usuario?.foto_perfil_url) {
+      setFotoPerfilUrl(usuario.foto_perfil_url);
+    }
+  }, [usuario, token]);
+
+  const cerrarSesion = () => {
+    localStorage.clear();
+    navigate('/login');
+  };
+
+  // Subir foto
+  const manejarArchivo = (e) => {
+    setArchivoSeleccionado(e.target.files[0]);
+  };
+
+  const subirFoto = () => {
+    if (!archivoSeleccionado) return alert('Selecciona una imagen primero');
+    const formData = new FormData();
+    formData.append('foto_perfil', archivoSeleccionado);
+
+    axios.patch(`${process.env.REACT_APP_API_URL}/api/usuario/foto_perfil/`, formData, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data'
+      }
+    }).then(res => {
+      setFotoPerfilUrl(res.data.foto_perfil_url);
+      // Actualizar usuario localStorage para reflejar cambio
+      localStorage.setItem('usuario', JSON.stringify(res.data));
+      setMostrarModal(false);
+    }).catch(err => {
+      console.error(err);
+      alert('Error al subir la imagen');
+    });
+  };
 
   const esMonitor = usuario?.rol === 'monitor' || usuario?.rol === 'admin';
 
@@ -47,13 +70,21 @@ export default function Cabecera() {
           <h1>Gimnasio Online</h1>
         </div>
         <div className="perfil-dropdown">
-          <button className="perfil-btn">
-            <img src={perfilIcono} alt="Perfil" className="perfil-icono" />
+          <button className="perfil-btn" onClick={() => setMostrarModal(!mostrarModal)}>
+            <img
+              src={fotoPerfilUrl || perfilIcono}
+              alt="Perfil"
+              className="perfil-icono"
+              style={{ borderRadius: '50%', width: '40px', height: '40px', objectFit: 'cover' }}
+            />
             <span>{usuario?.username || 'Mi cuenta'} ▾</span>
           </button>
           <div className="perfil-menu">
             <p><strong>{usuario?.username || 'Usuario'}</strong></p>
             <p>Rol: {usuario?.rol || 'Cliente'}</p>
+
+            {/* Botón para abrir modal de editar foto */}
+            <button onClick={() => setMostrarModal(true)}>Editar foto de perfil</button>
 
             {usuario?.rol === 'cliente' && (
               <div>
@@ -80,6 +111,18 @@ export default function Cabecera() {
           </ul>
         </nav>
       </div>
+
+      {/* Modal para subir foto */}
+      {mostrarModal && (
+        <div className="modal-overlay" onClick={() => setMostrarModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <h2>Subir nueva foto de perfil</h2>
+            <input type="file" accept="image/*" onChange={manejarArchivo} />
+            <button onClick={subirFoto}>Subir</button>
+            <button onClick={() => setMostrarModal(false)}>Cancelar</button>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

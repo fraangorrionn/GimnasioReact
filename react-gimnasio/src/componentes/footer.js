@@ -44,8 +44,8 @@ export default function Footer() {
           <p>FAQ - Preguntas frecuentes</p>
         </div>
         <div>
-          <p>DF solidario</p>
-          <p>DF sostenible</p>
+          <p>GW solidario</p>
+          <p>GW sostenible</p>
           <p>Contáctanos</p>
           <p>Noticias</p>
           <p>Blog</p>

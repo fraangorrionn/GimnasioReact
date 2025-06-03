@@ -7,7 +7,6 @@ import axios from 'axios';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
-import './InicioPagina.css';
 
 import img1 from '../assets/carrusel1.png';
 import img2 from '../assets/carrusel2.png';

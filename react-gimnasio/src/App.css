@@ -1,38 +1,194 @@
-.App {
+
+/* ===== RESET Y GLOBAL ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  background: linear-gradient(135deg, #0f0f0f, #1a1a1a, #003322);
+  color: white;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* ===== TIPOGRAFÍA ===== */
+h1, h2, h3, h4, h5, h6 {
+  color: #2ecc71;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+p {
+  line-height: 1.6;
+}
+
+/* ===== BOTONES ===== */
+button, .btn-verde, .btn-crear, .btn-editar, .btn-cancelar, .btn-rojo, .btn-azul {
+  padding: 0.6rem 1.2rem;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s, transform 0.2s;
+  display: inline-block;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.btn-verde, .btn-crear {
+  background-color: #2ecc71;
+  color: black;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.btn-verde:hover, .btn-crear:hover {
+  background-color: #27ae60;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+.btn-rojo, .btn-cancelar {
+  background-color: #e74c3c;
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.btn-rojo:hover, .btn-cancelar:hover {
+  background-color: #c0392b;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.btn-azul, .btn-editar {
+  background-color: #3498db;
+  color: white;
 }
+
+.btn-azul:hover, .btn-editar:hover {
+  background-color: #2980b9;
+}
+
+/* ===== BOTÓN DETALLE TARJETA ===== */
+.btn-detalle {
+  background-color: #2ecc71;
+  color: black;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  width: fit-content;
+  align-self: flex-start;
+  transition: background-color 0.3s;
+}
+
+.btn-detalle:hover {
+  background-color: #27ae60;
+  color: white;
+}
+
+/* ===== TARJETAS ===== */
+.tarjeta, .tarjeta-clase {
+  background-color: #000 !important;
+  color: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  border: 1px solid #2ecc71;
+  box-shadow: 0 0 10px rgba(0, 255, 150, 0.2);
+  max-width: 400px;
+  margin: 1rem auto;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.tarjeta h3, .tarjeta-clase h3 {
+  color: #00ff99;
+}
+
+.tarjeta:hover, .tarjeta-clase:hover {
+  transform: scale(1.02);
+}
+
+/* ===== FORMULARIOS ===== */
+input, textarea, select {
+  width: 100%;
+  padding: 0.7rem;
+  margin-top: 0.5rem;
+  background-color: #1e1e1e;
+  color: white;
+  border: 1px solid #2ecc71;
+  border-radius: 5px;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #aaa;
+}
+
+/* ===== CARRUSEL ===== */
+.swiper-container {
+  width: 100vw;
+  margin: 0 auto;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.swiper {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.carrusel-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.carrusel-img:hover {
+  transform: scale(1.02);
+}
+
+/* ===== MENÚ DESPLEGABLE PERFIL ===== */
+.perfil-menu button,
+.perfil-btn {
+  background-color: #2ecc71;
+  color: black;
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.perfil-menu button:hover,
+.perfil-btn:hover {
+  background-color: #27ae60;
+  color: white;
+}
+
+/* ===== PAGO ===== */
+.pago-container {
+  background-color: #000;
+  color: white;
+  max-width: 500px;
+  margin: 6rem auto 4rem auto; /* ↑ ↑ ↑ ↑ */
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid #00ff99;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(0, 255, 153, 0.2);
+  margin-top: 6rem; 
+}
+
+
+/* ===== UTILIDADES ===== */
+.centrado { text-align: center; }
+.sombra-verde { box-shadow: 0 0 10px rgba(0, 255, 0, 0.2); }
+.texto-blanco { color: white; }
+.texto-verde { color: #2ecc71; }

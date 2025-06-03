@@ -11,6 +11,9 @@ function PagoView() {
     const renderPayPalButton = () => {
       if (!window.paypal) return;
 
+      const container = document.getElementById('paypal-button-container');
+      if (container) container.innerHTML = ''; // Evita duplicados
+
       window.paypal.Buttons({
         createOrder: (data, actions) => {
           return actions.order.create({
@@ -22,7 +25,7 @@ function PagoView() {
         onApprove: async (data, actions) => {
           try {
             const order = await actions.order.capture();
-            console.log("✅ Pago capturado correctamente en PayPal:", order);
+            console.log("Pago capturado correctamente en PayPal:", order);
 
             const response = await fetch(`${API_URL}/api/pagos/crear/`, {
               method: 'POST',
@@ -68,7 +71,10 @@ function PagoView() {
 
     const existingScript = document.getElementById('paypal-sdk');
     if (existingScript) {
-      renderPayPalButton();
+      const container = document.getElementById('paypal-button-container');
+      if (container && container.children.length === 0) {
+        renderPayPalButton();
+      }
       return;
     }
 
@@ -80,9 +86,9 @@ function PagoView() {
   }, [navigate, token]);
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '3rem' }}>
+    <div className="pago-container">
       <h2>Completa tu suscripción</h2>
-      <div id="paypal-button-container" style={{ marginTop: '2rem' }}></div>
+      <div id="paypal-button-container"></div>
     </div>
   );
 }

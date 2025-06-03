@@ -97,3 +97,78 @@
 .cabecera-nav a:hover {
   text-decoration: underline;
 }
+
+/* Fondo semi-transparente oscuro para el modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* Contenedor blanco con bordes redondeados y sombra */
+.modal-content {
+  background: #121212;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,255,0,0.6);
+  color: white;
+  width: 380px;
+  max-width: 90%;
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Título */
+.modal-content h2 {
+  color: #4ade80; /* Verde claro */
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  font-size: 1.6rem;
+}
+
+/* Input file con borde y fondo oscuro */
+.modal-content input[type="file"] {
+  width: 100%;
+  padding: 0.6rem;
+  margin-bottom: 1.5rem;
+  background-color: #222;
+  border: 1px solid #4ade80;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+}
+
+/* Botones */
+.modal-content button {
+  background-color: #4ade80;
+  border: none;
+  color: #121212;
+  font-weight: 700;
+  padding: 0.6rem 1.4rem;
+  margin: 0 0.6rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.modal-content button:hover {
+  background-color: #22c55e;
+}
+
+/* Botón cancelar con color secundario */
+.modal-content button:last-child {
+  background-color: #444;
+  color: #ccc;
+}
+
+.modal-content button:last-child:hover {
+  background-color: #666;
+}
+

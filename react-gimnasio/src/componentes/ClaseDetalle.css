@@ -17,7 +17,7 @@
   padding: 1.5rem;
   border: 1px solid #2ecc71;
   border-radius: 8px;
-  background-color: #111;
+  background-color: #000000;
   color: white;
   width: 100%;
   max-width: 600px;
@@ -70,7 +70,7 @@
   border: 1px solid #2ecc71;
   padding: 1.5rem;
   border-radius: 12px;
-  background: #111;
+  background-color: #000000;
   color: white;
   width: 100%;
   text-align: left;
@@ -145,7 +145,7 @@
   border-collapse: collapse;
   width: 95%;
   max-width: 1400px;
-  background-color: #111;
+  background-color: #000000;
   border: 2px solid #2ecc71;
   border-radius: 8px;
   overflow: hidden;
@@ -162,14 +162,14 @@
 }
 
 .tabla-horarios th {
-  background-color: #111;
+  background-color: #000000;
   color: #2ecc71;
   font-weight: bold;
 }
 
 .tabla-horarios td.libre {
   cursor: pointer;
-  background-color: #111;
+  background-color: #000000;
   transition: background-color 0.2s;
   position: relative;
 }
@@ -192,7 +192,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background-color: #111;
+  background-color: #000000;
   border: 1px solid #2ecc71;
   padding: 0.5rem;
   border-radius: 4px;
