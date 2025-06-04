@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
-
 import './CrudFormulario.css';
+import { obtenerClases, obtenerCategorias } from '../services/claseService';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
 function CrudClases() {
   const [clases, setClases] = useState([]);
+  const [categorias, setCategorias] = useState([]);
   const [formulario, setFormulario] = useState({
     nombre: '',
     descripcion: '',
-    tipo: '',
+    categoria: '',
     cupo_maximo: 10,
     usuario: 1
   });
@@ -25,34 +26,39 @@ function CrudClases() {
 
   useEffect(() => {
     if (esMonitor) {
-      obtenerClases();
+      obtenerClases().then(setClases);
+      obtenerCategorias().then(setCategorias);
       setFormulario(prev => ({ ...prev, usuario: usuario.id }));
     }
   }, [esMonitor, usuario.id]);
 
-  const obtenerClases = () => {
-    axios.get(`${API_URL}/api/clases/`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => setClases(res.data))
-      .catch(err => console.error(err));
+  const limpiarFormulario = () => {
+    setFormulario({
+      nombre: '',
+      descripcion: '',
+      categoria: '',
+      cupo_maximo: 10,
+      usuario: usuario.id
+    });
+    setClaseSeleccionada(null);
+    setModoEdicion(false);
+    setImagenClase(null);
+  };
+
+  const handleChange = e => {
+    setFormulario({ ...formulario, [e.target.name]: e.target.value });
   };
 
   const crearClase = () => {
-    if (!esMonitor) {
-      console.log("Permiso denegado. Solo los monitores pueden crear clases.");
-      return;
-    }
+    if (!esMonitor) return;
 
     const formData = new FormData();
     formData.append('nombre', formulario.nombre);
     formData.append('descripcion', formulario.descripcion);
-    formData.append('tipo', formulario.tipo);
+    formData.append('categoria', formulario.categoria);
     formData.append('cupo_maximo', formulario.cupo_maximo);
     formData.append('usuario', formulario.usuario);
-    if (imagenClase) {
-      formData.append('imagen', imagenClase);
-    }
+    if (imagenClase) formData.append('imagen', imagenClase);
 
     axios.post(`${API_URL}/api/clases/crear/`, formData, {
       headers: {
@@ -60,32 +66,22 @@ function CrudClases() {
         'Content-Type': 'multipart/form-data'
       }
     })
-      .then(() => {
-        obtenerClases();
-        alert('Clase creada');
-        limpiarFormulario();
-      })
-      .catch(err => console.error(err));
-  };
-
-  const eliminarClase = (id) => {
-    axios.delete(`${API_URL}/api/clases/eliminar/${id}/`, {
-      headers: { Authorization: `Bearer ${token}` }
+    .then(() => {
+      obtenerClases().then(setClases);
+      alert('Clase creada');
+      limpiarFormulario();
     })
-      .then(() => obtenerClases())
-      .catch(err => console.error(err));
+    .catch(err => console.error(err));
   };
 
   const editarClase = () => {
     const formData = new FormData();
     formData.append('nombre', formulario.nombre);
     formData.append('descripcion', formulario.descripcion);
-    formData.append('tipo', formulario.tipo);
+    formData.append('categoria', formulario.categoria);
     formData.append('cupo_maximo', formulario.cupo_maximo);
     formData.append('usuario', formulario.usuario);
-    if (imagenClase) {
-      formData.append('imagen', imagenClase);
-    }
+    if (imagenClase) formData.append('imagen', imagenClase);
 
     axios.put(`${API_URL}/api/clases/editar/${claseSeleccionada}/`, formData, {
       headers: {
@@ -93,13 +89,20 @@ function CrudClases() {
         'Content-Type': 'multipart/form-data'
       }
     })
-      .then(() => {
-        obtenerClases();
-        alert('Clase editada');
-        setModoEdicion(false);
-        limpiarFormulario();
-      })
-      .catch(err => console.error(err));
+    .then(() => {
+      obtenerClases().then(setClases);
+      alert('Clase editada');
+      limpiarFormulario();
+    })
+    .catch(err => console.error(err));
+  };
+
+  const eliminarClase = (id) => {
+    axios.delete(`${API_URL}/api/clases/eliminar/${id}/`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(() => obtenerClases().then(setClases))
+    .catch(err => console.error(err));
   };
 
   const seleccionarClase = (clase) => {
@@ -108,22 +111,11 @@ function CrudClases() {
     setFormulario({
       nombre: clase.nombre,
       descripcion: clase.descripcion,
-      tipo: clase.tipo,
+      categoria: clase.categoria,
       cupo_maximo: clase.cupo_maximo,
       usuario: clase.usuario
     });
-    setImagenClase(null); // Limpiar imagen para evitar confusión, podría mejorarse mostrando la actual
-  };
-
-  const limpiarFormulario = () => {
-    setFormulario({ nombre: '', descripcion: '', tipo: '', cupo_maximo: 10, usuario: usuario.id });
-    setClaseSeleccionada(null);
-    setModoEdicion(false);
     setImagenClase(null);
-  };
-
-  const handleChange = e => {
-    setFormulario({ ...formulario, [e.target.name]: e.target.value });
   };
 
   if (!esMonitor) return <div>No tienes permiso para ver esta página.</div>;
@@ -139,8 +131,17 @@ function CrudClases() {
           <label>Descripción</label>
           <textarea name="descripcion" value={formulario.descripcion} onChange={handleChange} placeholder="Descripción de la clase"></textarea>
 
-          <label>Tipo</label>
-          <input type="text" name="tipo" value={formulario.tipo} onChange={handleChange} placeholder="Tipo (ej: boxeo, yoga...)" />
+          <label>Categoría</label>
+          <select
+            name="categoria"
+            value={formulario.categoria}
+            onChange={handleChange}
+          >
+            <option value="">Selecciona una categoría</option>
+            {categorias.map(cat => (
+              <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+            ))}
+          </select>
 
           <label>Cupo máximo</label>
           <input type="number" name="cupo_maximo" value={formulario.cupo_maximo} onChange={handleChange} />
@@ -177,7 +178,7 @@ function CrudClases() {
             )}
             <h3>{clase.nombre}</h3>
             <p><strong>Descripción:</strong> {clase.descripcion}</p>
-            <p><strong>Tipo:</strong> {clase.tipo}</p>
+            <p><strong>Categoría:</strong> {clase.categoria_nombre}</p>
             <p><strong>Cupo máximo:</strong> {clase.cupo_maximo}</p>
             <div className="acciones">
               <button onClick={() => seleccionarClase(clase)} className="btn-editar">Editar</button>

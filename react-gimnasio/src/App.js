@@ -8,6 +8,8 @@ import Footer from './componentes/footer';
 import CrudClases from './componentes/CrudClases';
 import ClaseDetalle from './componentes/ClaseDetalle';
 import PagoView from './componentes/PagoView';
+import CategoriaDetalle from './componentes/CategoriaDetalle';
+
 
 
 function App() {
@@ -22,6 +24,7 @@ function App() {
         <Route path="/crud/clases" element={<CrudClases />} />
         <Route path="/clases/:id" element={<ClaseDetalle />} />
         <Route path="/pago" element={<PagoView />} />
+        <Route path="/categorias/:categoriaNombre" element={<CategoriaDetalle />} />
       </Routes>
       <Footer />
     </Router>

@@ -105,10 +105,23 @@ export default function Cabecera() {
 
       <div className="cabecera-nav">
         <nav>
-          <ul>
-            <li><Link to="/inicio">Inicio</Link></li>
-            {esMonitor && <li><Link to="/crud/clases">Crear Clases</Link></li>}
-          </ul>
+        <ul>
+          <li><Link to="/inicio">Inicio</Link></li>
+          <li className="categorias-dropdown">
+            <span>Categorías ▾</span>
+            <ul className="submenu-categorias">
+              <li><Link to="/categorias/mma">MMA</Link></li>
+              <li><Link to="/categorias/boxeo">Boxeo</Link></li>
+              <li><Link to="/categorias/taekwondo">Taekwondo</Link></li>
+              <li><Link to="/categorias/muai-thai">Muai Thai</Link></li>
+              <li><Link to="/categorias/zumba">Zumba</Link></li>
+              <li><Link to="/categorias/natacion">Natación</Link></li>
+              <li><Link to="/categorias/yoga">Yoga</Link></li>
+              <Link to="/categorias/entrenamiento-de-fuerza">Entrenamiento de fuerza</Link>
+            </ul>
+          </li>
+          {esMonitor && <li><Link to="/crud/clases">Crear Clases</Link></li>}
+        </ul>
         </nav>
       </div>
 

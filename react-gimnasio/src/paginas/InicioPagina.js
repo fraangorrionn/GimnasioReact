@@ -52,7 +52,7 @@ function InicioPagina() {
         {clases.map(clase => (
           <div key={clase.id} className="tarjeta-clase">
             <h3>{clase.nombre}</h3>
-            <p><strong>Tipo:</strong> {clase.tipo}</p>
+            <p><strong>Categoría:</strong> {clase.categoria_nombre}</p>
             <p><strong>Descripción:</strong> {clase.descripcion}</p>
             <p><strong>Cupo máximo:</strong> {clase.cupo_maximo}</p>
             <Link to={`/clases/${clase.id}`} className="btn-detalle">Ver detalles</Link>

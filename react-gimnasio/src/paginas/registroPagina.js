@@ -1,4 +1,3 @@
-// src/paginas/registroPagina.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +8,8 @@ const API_URL = process.env.REACT_APP_API_URL;
 function RegistroPagina() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    username: '',
+    first_name: '',
+    last_name: '',
     email: '',
     password: '',
     rol: 'cliente',
@@ -40,9 +40,38 @@ function RegistroPagina() {
         <h2>Registro</h2>
         {error && <p className="error">{error}</p>}
         <form onSubmit={handleSubmit}>
-          <input type="text" name="username" placeholder="Nombre de usuario" value={formData.username} onChange={handleChange} required />
-          <input type="email" name="email" placeholder="Correo electrónico" value={formData.email} onChange={handleChange} required />
-          <input type="password" name="password" placeholder="Contraseña" value={formData.password} onChange={handleChange} required />
+          <input
+            type="text"
+            name="first_name"
+            placeholder="Nombre"
+            value={formData.first_name}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="text"
+            name="last_name"
+            placeholder="Apellidos"
+            value={formData.last_name}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Correo electrónico"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Contraseña"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
           <select name="rol" value={formData.rol} onChange={handleChange}>
             <option value="cliente">Cliente</option>
             <option value="monitor">Monitor</option>
