@@ -17,6 +17,9 @@ function ClaseDetalle() {
 
   const [horarios, setHorarios] = useState([]);
   const [publicaciones, setPublicaciones] = useState([]);
+  const [reservasPorHorario, setReservasPorHorario] = useState({});
+  const [horariosReservados, setHorariosReservados] = useState(new Set());
+  const [claseInfo, setClaseInfo] = useState(null);
   const [mostrarFormPublicacion, setMostrarFormPublicacion] = useState(false);
   const [formularioPublicacion, setFormularioPublicacion] = useState({
     clase: id,
@@ -33,6 +36,45 @@ function ClaseDetalle() {
   const token = localStorage.getItem('access_token');
   const esMonitor = usuario.rol === 'monitor' || usuario.rol === 'admin';
   const esCliente = usuario.rol === 'cliente';
+  const esCreador = claseInfo && claseInfo.usuario === usuario.id;
+
+  
+  const obtenerClaseInfo = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/clases/${id}/`);
+      setClaseInfo(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [id]);
+
+  
+  const obtenerReservas = useCallback(async () => {
+    try {
+      const datos = {};
+      const reservasUsuario = new Set();
+
+      await Promise.all(horarios.map(async (h) => {
+        const res = await axios.get(`${API_URL}/api/reservas/${h.id}/contador/`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        datos[h.id] = res.data.reservas;
+
+        const yaReservado = await axios.get(`${API_URL}/api/reservas/${h.id}/`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }).catch(() => null);
+
+        if (yaReservado?.data?.reservado) {
+          reservasUsuario.add(h.id);
+        }
+      }));
+
+      setReservasPorHorario(datos);
+      setHorariosReservados(reservasUsuario);
+    } catch (err) {
+      console.error('Error al obtener reservas:', err);
+    }
+  }, [horarios, token]);
 
   const obtenerHorarios = useCallback(async () => {
     const res = await axios.get(`${API_URL}/api/horarios/`);
@@ -83,11 +125,19 @@ function ClaseDetalle() {
   }, [esCliente, token, usuario.id]);
 
   useEffect(() => {
+    obtenerClaseInfo();
     obtenerHorarios();
     obtenerPublicaciones();
     obtenerInscripcion();
     verificarSuscripcionYPago();
-  }, [obtenerHorarios, obtenerPublicaciones, obtenerInscripcion, verificarSuscripcionYPago, suscripcionActivada]);
+  },
+  [obtenerHorarios, obtenerPublicaciones, obtenerInscripcion, verificarSuscripcionYPago, suscripcionActivada]);
+
+  useEffect(() => {
+    if (inscrito) {
+      obtenerReservas();
+    }
+  }, [horarios, inscrito, obtenerReservas]);
 
   const gestionarInscripcion = async () => {
     try {
@@ -229,9 +279,37 @@ function ClaseDetalle() {
 
   const normalizarHora = h => h.slice(0, 5);
 
+  const reservarHorario = async (horarioId) => {
+    try {
+      await axios.post(`${API_URL}/api/reservas/${horarioId}/crear/`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      obtenerReservas();
+    } catch (err) {
+      alert(err.response?.data?.error || 'Error al reservar');
+    }
+  };
+
+  const cancelarReserva = async (horarioId) => {
+    try {
+      await axios.delete(`${API_URL}/api/reservas/${horarioId}/cancelar/`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      obtenerReservas();
+    } catch (err) {
+      alert(err.response?.data?.error || 'Error al cancelar');
+    }
+  };
+
+
   return (
     <div className="clase-detalle">
       <h2>Clase #{id}</h2>
+      {usuario.rol === 'monitor' && claseInfo && claseInfo.usuario !== usuario.id && (
+        <div style={{ textAlign: 'center', color: 'tomato', fontWeight: 'bold', marginBottom: '1rem' }}>
+          No eres monitor en esta clase. No puedes trabajar en ella.
+        </div>
+      )}
 
       {esCliente && puedeInscribirse && (
         <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
@@ -284,9 +362,28 @@ function ClaseDetalle() {
                       onClick={() => handleClickCelda(dia, hora)}
                       title={horario?.clase_nombre || 'Haz clic para modificar'}
                     >
-                      {horario ? horario.clase_nombre : (esMonitor ? '+' : '')}
+                      {horario ? horario.clase_nombre : (esCreador ? '+' : '')}
 
-                      {esActiva && esMonitor && (
+                      {esCliente && inscrito && horario && (
+  <div className="reserva-info">
+    <div className="contador-reservas">
+      {reservasPorHorario[horario.id] || 0} / {claseInfo?.cupo_maximo} reservados
+    </div>
+    {horariosReservados.has(horario.id) ? (
+      <button onClick={(e) => { e.stopPropagation(); cancelarReserva(horario.id); }}>
+        Cancelar reserva
+      </button>
+    ) : (
+      reservasPorHorario[horario.id] < claseInfo?.cupo_maximo && (
+        <button onClick={(e) => { e.stopPropagation(); reservarHorario(horario.id); }}>
+          Reservar
+        </button>
+      )
+    )}
+  </div>
+)}
+
+                      {esActiva && esCreador && (
                         <div className="celda-horario-opciones">
                           {horario ? (
                             <button onClick={(e) => {
@@ -313,7 +410,7 @@ function ClaseDetalle() {
       <section className="publicaciones-clase">
         <h3>Publicaciones</h3>
 
-        {esMonitor && (
+        {esCreador && (
           <>
             <button
               className="btn-nueva-publicacion"
@@ -361,7 +458,7 @@ function ClaseDetalle() {
           <div className="lista-publicaciones">
             {publicaciones.map(p => (
               <div key={p.id} className="publicacion">
-                {esMonitor && (
+                {esCreador && (
                   <div className="acciones">
                     <button onClick={() => handleEditarPublicacion(p)}>Editar</button>
                     <button onClick={() => handleEliminarPublicacion(p.id)}>Eliminar</button>
@@ -380,5 +477,6 @@ function ClaseDetalle() {
     </div>
   );
 }
+
 
 export default ClaseDetalle;

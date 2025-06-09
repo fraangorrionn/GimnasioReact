@@ -248,3 +248,10 @@ nav ul li a:hover {
 .categorias-dropdown:hover .submenu-categorias {
   display: block !important;
 }
+
+.icono-nav {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  margin-right: 5px;
+}

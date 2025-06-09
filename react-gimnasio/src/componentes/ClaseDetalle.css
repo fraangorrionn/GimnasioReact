@@ -156,8 +156,13 @@
 
 .tabla-horarios th,
 .tabla-horarios td {
+  vertical-align: middle;
+  height: 90px;
+  box-sizing: border-box;
+  overflow: hidden;
   border: 1px solid #2ecc71;
-  padding: 1rem;
+  padding: 0.5rem;
+  max-height: 90px;
   position: relative;
 }
 
@@ -220,4 +225,39 @@
   background-color: #27ae60;
   transform: scale(1.05);
   box-shadow: 0 0 16px rgba(46, 204, 113, 0.8);
+}
+
+.reserva-info {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-height: 70px;
+  overflow: hidden;
+}
+
+.contador-reservas {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #000;
+  background-color: #a0f0c0;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  margin-bottom: 0.3rem;
+}
+
+
+.reserva-info button {
+  font-size: 0.75rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px;
+  background-color: #2ecc71;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.reserva-info button:hover {
+  background-color: #27ae60;
+  color: white;
 }

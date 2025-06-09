@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
@@ -7,8 +8,9 @@ import './loginPagina.css';
 const API_URL = process.env.REACT_APP_API_URL;
 
 function LoginPagina() {
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState({ username: '', password: '' });
   const [error, setError] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -44,23 +46,43 @@ function LoginPagina() {
     <div className="login-container">
       <div className="login-card">
         <h2>Iniciar sesión</h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} autoComplete="off">
           <input
-            type="email"
-            name="email"
-            placeholder="Correo electrónico"
-            value={formData.email}
+            type="text"
+            name="username"
+            placeholder="Correo electrónico o nombre de usuario"
+            value={formData.username}
             onChange={handleChange}
+            autoComplete="off"
             required
           />
-          <input
-            type="password"
-            name="password"
-            placeholder="Contraseña"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
+          <div style={{ position: 'relative' }}>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              placeholder="Contraseña"
+              value={formData.password}
+              onChange={handleChange}
+              autoComplete="new-password"
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: 'absolute',
+                top: '50%',
+                right: '10px',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                color: '#ccc',
+                cursor: 'pointer'
+              }}
+            >
+              {showPassword ? 'Ocultar' : 'Mostrar'}
+            </button>
+          </div>
           <button type="submit" className="btn-entrar">Entrar</button>
         </form>
         {error && <p className="error">{error}</p>}

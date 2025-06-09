@@ -186,6 +186,14 @@ input::placeholder, textarea::placeholder {
   margin-top: 6rem; 
 }
 
+.tarjetas-clases {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 2rem 1rem;
+}
+
 
 /* ===== UTILIDADES ===== */
 .centrado { text-align: center; }

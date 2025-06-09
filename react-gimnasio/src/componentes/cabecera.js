@@ -4,6 +4,9 @@ import axios from 'axios';
 import './cabecera.css';
 import perfilIcono from '../assets/perfil.png';
 import logo from '../assets/logo.png';
+import iconoInicio from '../assets/home.png';
+import iconoCategorias from '../assets/categorias.png';
+import iconoCrear from '../assets/crear.png';
 
 export default function Cabecera() {
   const navigate = useNavigate();
@@ -105,23 +108,38 @@ export default function Cabecera() {
 
       <div className="cabecera-nav">
         <nav>
-        <ul>
-          <li><Link to="/inicio">Inicio</Link></li>
-          <li className="categorias-dropdown">
-            <span>Categorías ▾</span>
-            <ul className="submenu-categorias">
-              <li><Link to="/categorias/mma">MMA</Link></li>
-              <li><Link to="/categorias/boxeo">Boxeo</Link></li>
-              <li><Link to="/categorias/taekwondo">Taekwondo</Link></li>
-              <li><Link to="/categorias/muai-thai">Muai Thai</Link></li>
-              <li><Link to="/categorias/zumba">Zumba</Link></li>
-              <li><Link to="/categorias/natacion">Natación</Link></li>
-              <li><Link to="/categorias/yoga">Yoga</Link></li>
-              <Link to="/categorias/entrenamiento-de-fuerza">Entrenamiento de fuerza</Link>
-            </ul>
-          </li>
-          {esMonitor && <li><Link to="/crud/clases">Crear Clases</Link></li>}
-        </ul>
+          <ul>
+            <li>
+              <Link to="/inicio">
+                <img src={iconoInicio} alt="Inicio" className="icono-nav" />
+                Inicio
+              </Link>
+            </li>
+            <li className="categorias-dropdown">
+              <span>
+                <img src={iconoCategorias} alt="Categorías" className="icono-nav" />
+                Categorías ▾
+              </span>
+              <ul className="submenu-categorias">
+                <li><Link to="/categorias/mma">MMA</Link></li>
+                <li><Link to="/categorias/boxeo">Boxeo</Link></li>
+                <li><Link to="/categorias/taekwondo">Taekwondo</Link></li>
+                <li><Link to="/categorias/muai-thai">Muai Thai</Link></li>
+                <li><Link to="/categorias/zumba">Zumba</Link></li>
+                <li><Link to="/categorias/natacion">Natación</Link></li>
+                <li><Link to="/categorias/yoga">Yoga</Link></li>
+                <li><Link to="/categorias/entrenamiento-de-fuerza">Entrenamiento de fuerza</Link></li>
+              </ul>
+            </li>
+            {esMonitor && (
+              <li>
+                <Link to="/crud/clases">
+                  <img src={iconoCrear} alt="Crear" className="icono-nav" />
+                  Crear Clases
+                </Link>
+              </li>
+            )}
+          </ul>
         </nav>
       </div>
 
