@@ -466,7 +466,7 @@ function ClaseDetalle() {
                 )}
                 <h4>{p.titulo}</h4>
                 <p>{p.contenido}</p>
-                {p.imagen && <img src={`${API_URL}${p.imagen}`} alt="Publicación" />}
+                {p.imagen && <img src={p.imagen} alt="Publicación" />}
                 <p className="fecha">{p.fecha_publicacion}</p>
                 <ComentariosPublicacion publicacionId={p.id} />
               </div>
