@@ -1,18 +1,25 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Notificacion from './Notificacion';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
 function PagoView() {
   const navigate = useNavigate();
   const token = localStorage.getItem('access_token');
+  const [notificacion, setNotificacion] = useState({ visible: false, mensaje: '', tipo: 'success' });
+
+  const mostrarNotificacion = (mensaje, tipo = 'success') => {
+    setNotificacion({ visible: true, mensaje, tipo });
+    setTimeout(() => setNotificacion({ ...notificacion, visible: false }), 3000);
+  };
 
   useEffect(() => {
     const renderPayPalButton = () => {
       if (!window.paypal) return;
 
       const container = document.getElementById('paypal-button-container');
-      if (container) container.innerHTML = ''; // Evita duplicados
+      if (container) container.innerHTML = '';
 
       window.paypal.Buttons({
         createOrder: (data, actions) => {
@@ -39,7 +46,7 @@ function PagoView() {
             if (!response.ok) {
               const errorData = await response.json();
               console.error("Error al registrar el pago en backend:", errorData);
-              alert('El pago se realizó pero no se registró correctamente en el sistema.');
+              mostrarNotificacion('El pago se realizó pero no se registró correctamente en el sistema.', 'error');
               return;
             }
 
@@ -50,21 +57,23 @@ function PagoView() {
             localStorage.removeItem('clase_pago');
             localStorage.setItem('suscripcion_activada', 'true');
 
-            alert('Pago completado y suscripción activada.');
+            mostrarNotificacion('Pago completado y suscripción activada.', 'success');
 
-            if (claseId) {
-              navigate(`/clases/${claseId}`, { state: { suscripcion_activada: true } });
-            } else {
-              navigate('/inicio');
-            }
+            setTimeout(() => {
+              if (claseId) {
+                navigate(`/clases/${claseId}`, { state: { suscripcion_activada: true } });
+              } else {
+                navigate('/inicio');
+              }
+            }, 1500);
           } catch (error) {
             console.error('Error durante el proceso de pago:', error);
-            alert('Hubo un problema al procesar tu pago.');
+            mostrarNotificacion('Hubo un problema al procesar tu pago.', 'error');
           }
         },
         onError: err => {
           console.error('Error en PayPal:', err);
-          alert('Error durante el pago con PayPal.');
+          mostrarNotificacion('Error durante el pago con PayPal.', 'error');
         }
       }).render('#paypal-button-container');
     };
@@ -87,6 +96,12 @@ function PagoView() {
 
   return (
     <div className="pago-container">
+      <Notificacion
+        mensaje={notificacion.mensaje}
+        tipo={notificacion.tipo}
+        visible={notificacion.visible}
+        onClose={() => setNotificacion({ ...notificacion, visible: false })}
+      />
       <h2>Completa tu suscripción</h2>
       <div id="paypal-button-container"></div>
     </div>

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -71,11 +72,19 @@ function CategoriaDetalle() {
         <div className="tarjetas-clases">
           {clases.map(clase => (
             <div key={clase.id} className="tarjeta-clase">
+              {clase.imagen_url && (
+                <img
+                  src={clase.imagen_url}
+                  alt={`Imagen de ${clase.nombre}`}
+                  className="imagen-clase"
+                  style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '10px' }}
+                />
+              )}
               <h3>{clase.nombre}</h3>
               <p><strong>Categoría:</strong> {clase.categoria_nombre}</p>
               <p><strong>Descripción:</strong> {clase.descripcion}</p>
               <p><strong>Cupo máximo:</strong> {clase.cupo_maximo}</p>
-              <a href={`/clases/${clase.id}`} className="btn-detalle">Ver detalles</a>
+              <Link to={`/clases/${clase.id}`} className="btn-detalle">Ver detalles</Link>
             </div>
           ))}
         </div>

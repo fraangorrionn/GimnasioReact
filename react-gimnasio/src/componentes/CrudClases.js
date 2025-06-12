@@ -1,8 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import './CrudFormulario.css';
 import { obtenerClases, obtenerCategorias } from '../services/claseService';
+import Notificacion from './Notificacion';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -19,6 +21,7 @@ function CrudClases() {
   const [imagenClase, setImagenClase] = useState(null);
   const [modoEdicion, setModoEdicion] = useState(false);
   const [claseSeleccionada, setClaseSeleccionada] = useState(null);
+  const [notificacion, setNotificacion] = useState({ visible: false, mensaje: '', tipo: 'success' });
 
   const usuario = JSON.parse(localStorage.getItem('usuario')) || {};
   const token = localStorage.getItem('access_token');
@@ -31,6 +34,11 @@ function CrudClases() {
       setFormulario(prev => ({ ...prev, usuario: usuario.id }));
     }
   }, [esMonitor, usuario.id]);
+
+  const mostrarNotificacion = (mensaje, tipo = 'success') => {
+    setNotificacion({ visible: true, mensaje, tipo });
+    setTimeout(() => setNotificacion({ ...notificacion, visible: false }), 3000);
+  };
 
   const limpiarFormulario = () => {
     setFormulario({
@@ -48,16 +56,23 @@ function CrudClases() {
   const handleChange = e => {
     setFormulario({ ...formulario, [e.target.name]: e.target.value });
   };
-
   const crearClase = () => {
     if (!esMonitor) return;
-
+  
+    if (!imagenClase) {
+      mostrarNotificacion("Debes seleccionar una imagen para la clase", "error");
+      return;
+    }
+  
+    console.log("Imagen seleccionada:", imagenClase);
+  
     const formData = new FormData();
     formData.append('nombre', formulario.nombre);
     formData.append('descripcion', formulario.descripcion);
     formData.append('categoria', formulario.categoria);
     formData.append('cupo_maximo', formulario.cupo_maximo);
     formData.append('usuario', formulario.usuario);
+    formData.append('imagen', imagenClase);
     if (imagenClase) formData.append('imagen', imagenClase);
 
     axios.post(`${API_URL}/api/clases/crear/`, formData, {
@@ -68,10 +83,13 @@ function CrudClases() {
     })
     .then(() => {
       obtenerClases().then(setClases);
-      alert('Clase creada');
+      mostrarNotificacion('Clase creada', 'success');
       limpiarFormulario();
     })
-    .catch(err => console.error(err));
+    .catch(err => {
+      console.error(err);
+      mostrarNotificacion('Error al crear la clase', 'error');
+    });
   };
 
   const editarClase = () => {
@@ -91,18 +109,27 @@ function CrudClases() {
     })
     .then(() => {
       obtenerClases().then(setClases);
-      alert('Clase editada');
+      mostrarNotificacion('Clase editada', 'success');
       limpiarFormulario();
     })
-    .catch(err => console.error(err));
+    .catch(err => {
+      console.error(err);
+      mostrarNotificacion('Error al editar la clase', 'error');
+    });
   };
 
   const eliminarClase = (id) => {
     axios.delete(`${API_URL}/api/clases/eliminar/${id}/`, {
       headers: { Authorization: `Bearer ${token}` }
     })
-    .then(() => obtenerClases().then(setClases))
-    .catch(err => console.error(err));
+    .then(() => {
+      obtenerClases().then(setClases);
+      mostrarNotificacion('Clase eliminada', 'success');
+    })
+    .catch(err => {
+      console.error(err);
+      mostrarNotificacion('Error al eliminar la clase', 'error');
+    });
   };
 
   const seleccionarClase = (clase) => {
@@ -122,6 +149,13 @@ function CrudClases() {
 
   return (
     <div className="crud-clases-container">
+      <Notificacion 
+        mensaje={notificacion.mensaje}
+        tipo={notificacion.tipo}
+        visible={notificacion.visible}
+        onClose={() => setNotificacion({ ...notificacion, visible: false })}
+      />
+
       <div className="formulario-clase">
         <h2>{modoEdicion ? 'Editar Clase' : 'Crear Clase'}</h2>
         <form onSubmit={e => e.preventDefault()}>
@@ -148,9 +182,10 @@ function CrudClases() {
 
           <label>Imagen de la clase</label>
           <input
+            key={modoEdicion ? claseSeleccionada : Date.now()}
             type="file"
             accept="image/*"
-            onChange={e => setImagenClase(e.target.files[0])}
+            onChange={(e) => setImagenClase(e.target.files[0])}
           />
 
           <div className="botones-formulario">

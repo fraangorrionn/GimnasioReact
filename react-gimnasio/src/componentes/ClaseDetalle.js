@@ -4,6 +4,7 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './ClaseDetalle.css';
 import ComentariosPublicacion from './ComentariosPublicacion';
+import Notificacion from './Notificacion';
 
 const DIAS = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
 const HORAS = Array.from({ length: 16 }, (_, i) => `${7 + i}:00`);
@@ -31,6 +32,19 @@ function ClaseDetalle() {
   const [celdaActiva, setCeldaActiva] = useState(null);
   const [inscrito, setInscrito] = useState(null);
   const [puedeInscribirse, setPuedeInscribirse] = useState(false);
+  const [notificacion, setNotificacion] = useState({
+    visible: false,
+    mensaje: '',
+    tipo: 'success'
+  });
+  
+  const mostrarNotificacion = (mensaje, tipo = 'success') => {
+    setNotificacion({ visible: true, mensaje, tipo });
+    setTimeout(() => {
+      setNotificacion(prev => ({ ...prev, visible: false }));
+    }, 3000);
+  };
+  
 
   const usuario = JSON.parse(localStorage.getItem('usuario')) || {};
   const token = localStorage.getItem('access_token');
@@ -146,6 +160,7 @@ function ClaseDetalle() {
           headers: { Authorization: `Bearer ${token}` }
         });
         setInscrito(null);
+        mostrarNotificacion('Inscripción cancelada', 'success');
       } else {
         await axios.post(`${API_URL}/api/inscripciones/crear/`, {
           usuario: usuario.id,
@@ -155,10 +170,11 @@ function ClaseDetalle() {
           headers: { Authorization: `Bearer ${token}` }
         });
         obtenerInscripcion();
+        mostrarNotificacion('Inscripción realizada con éxito', 'success');
       }
     } catch (err) {
       console.error(err);
-      alert('Error al gestionar inscripción');
+      mostrarNotificacion('Error al gestionar inscripción', 'error');
     }
   };
 
@@ -184,9 +200,10 @@ function ClaseDetalle() {
 
       setCeldaActiva(null);
       obtenerHorarios();
+      mostrarNotificacion('Clase añadida al horario', 'success');
     } catch (error) {
       console.error("Error al agregar horario:", error);
-      alert("No se pudo crear el horario. ¿Estás autenticado como monitor?");
+      mostrarNotificacion("No se pudo crear el horario. ¿Estás autenticado como monitor?", 'error');
     }
   };
 
@@ -205,9 +222,10 @@ function ClaseDetalle() {
         });
         setCeldaActiva(null);
         obtenerHorarios();
+        mostrarNotificacion('Horario eliminado', 'success');
       } catch (error) {
         console.error("Error al eliminar horario:", error);
-        alert("No se pudo eliminar el horario. ¿Estás autenticado como monitor?");
+        mostrarNotificacion("No se pudo eliminar el horario. ¿Estás autenticado como monitor?", 'error');
       }
     }
   };
@@ -285,8 +303,9 @@ function ClaseDetalle() {
         headers: { Authorization: `Bearer ${token}` }
       });
       obtenerReservas();
+      mostrarNotificacion('Reserva realizada', 'success');
     } catch (err) {
-      alert(err.response?.data?.error || 'Error al reservar');
+      mostrarNotificacion(err.response?.data?.error || 'Error al reservar', 'error');
     }
   };
 
@@ -296,30 +315,39 @@ function ClaseDetalle() {
         headers: { Authorization: `Bearer ${token}` }
       });
       obtenerReservas();
+      mostrarNotificacion('Reserva cancelada', 'success');
     } catch (err) {
-      alert(err.response?.data?.error || 'Error al cancelar');
+      mostrarNotificacion(err.response?.data?.error || 'Error al cancelar', 'error');
     }
   };
 
 
   return (
-    <div className="clase-detalle">
-      <h2>Clase #{id}</h2>
-      {usuario.rol === 'monitor' && claseInfo && claseInfo.usuario !== usuario.id && (
-        <div style={{ textAlign: 'center', color: 'tomato', fontWeight: 'bold', marginBottom: '1rem' }}>
-          No eres monitor en esta clase. No puedes trabajar en ella.
-        </div>
-      )}
-
-      {esCliente && puedeInscribirse && (
-        <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-          <button onClick={gestionarInscripcion} className="btn-crear">
-            {inscrito ? 'Cancelar inscripción' : 'Inscribirse a esta clase'}
-          </button>
-        </div>
-      )}
-
-      {esCliente && !puedeInscribirse && (
+    <>
+      <Notificacion
+        mensaje={notificacion.mensaje}
+        tipo={notificacion.tipo}
+        visible={notificacion.visible}
+        onClose={() => setNotificacion({ ...notificacion, visible: false })}
+      />
+  
+      <div className="clase-detalle">
+        <h2>Clase #{id}</h2>
+        {usuario.rol === 'monitor' && claseInfo && claseInfo.usuario !== usuario.id && (
+          <div style={{ textAlign: 'center', color: 'tomato', fontWeight: 'bold', marginBottom: '1rem' }}>
+            No eres monitor en esta clase. No puedes trabajar en ella.
+          </div>
+        )}
+  
+        {esCliente && puedeInscribirse && (
+          <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
+            <button onClick={gestionarInscripcion} className="btn-crear">
+              {inscrito ? 'Cancelar inscripción' : 'Inscribirse a esta clase'}
+            </button>
+          </div>
+        )}
+  
+  {esCliente && !puedeInscribirse && (
         <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
           <p style={{ color: 'tomato' }}>
             Necesitas una suscripción activa con un pago completado para inscribirte.
@@ -365,23 +393,23 @@ function ClaseDetalle() {
                       {horario ? horario.clase_nombre : (esCreador ? '+' : '')}
 
                       {esCliente && inscrito && horario && (
-  <div className="reserva-info">
-    <div className="contador-reservas">
-      {reservasPorHorario[horario.id] || 0} / {claseInfo?.cupo_maximo} reservados
-    </div>
-    {horariosReservados.has(horario.id) ? (
-      <button onClick={(e) => { e.stopPropagation(); cancelarReserva(horario.id); }}>
-        Cancelar reserva
-      </button>
-    ) : (
-      reservasPorHorario[horario.id] < claseInfo?.cupo_maximo && (
-        <button onClick={(e) => { e.stopPropagation(); reservarHorario(horario.id); }}>
-          Reservar
-        </button>
-      )
-    )}
-  </div>
-)}
+                        <div className="reserva-info">
+                          <div className="contador-reservas">
+                            {reservasPorHorario[horario.id] || 0} / {claseInfo?.cupo_maximo} reservados
+                          </div>
+                          {horariosReservados.has(horario.id) ? (
+                            <button onClick={(e) => { e.stopPropagation(); cancelarReserva(horario.id); }}>
+                              Cancelar reserva
+                            </button>
+                          ) : (
+                            reservasPorHorario[horario.id] < claseInfo?.cupo_maximo && (
+                              <button onClick={(e) => { e.stopPropagation(); reservarHorario(horario.id); }}>
+                                Reservar
+                              </button>
+                            )
+                          )}
+                        </div>
+                      )}
 
                       {esActiva && esCreador && (
                         <div className="celda-horario-opciones">
@@ -475,6 +503,7 @@ function ClaseDetalle() {
         )}
       </section>
     </div>
+    </>
   );
 }
 
